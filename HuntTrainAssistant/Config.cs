@@ -18,5 +18,6 @@ namespace HuntTrainAssistant
         public List<Sender> Conductors = new();
         public Sender CurrentConductor = new("", 0);
         public bool Debug = false;
+        public bool AutoOpenMap = true;
     }
 }

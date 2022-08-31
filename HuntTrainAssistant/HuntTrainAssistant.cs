@@ -6,6 +6,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons;
 using ECommons.SimpleGui;
 using Lumina.Excel.GeneratedSheets;
+using System.Diagnostics;
 
 namespace HuntTrainAssistant
 {
@@ -15,6 +16,8 @@ namespace HuntTrainAssistant
         internal Config config;
         internal (string Name, uint Territory) TeleportTo = (null, 0);
         internal long NextCommandAt = 0;
+        internal static ushort[] ValidZones = { 956, 957, 958, 959, 960, 961 };
+        ContextMenuManager contextMenuManager;
 
         public HuntTrainAssistant(DalamudPluginInterface pi)
         {
@@ -26,11 +29,16 @@ namespace HuntTrainAssistant
             Svc.Chat.ChatMessage += Chat_ChatMessage;
             Svc.Framework.Update += Framework_Update;
             Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
+            contextMenuManager = new();
         }
 
         private void ClientState_TerritoryChanged(object sender, ushort e)
         {
             TeleportTo = (null, 0);
+            if (!e.EqualsAny(ValidZones))
+            {
+                P.config.CurrentConductor = new("", 0);
+            }
         }
 
         private void Framework_Update(Dalamud.Game.Framework framework)
@@ -47,26 +55,65 @@ namespace HuntTrainAssistant
                 }
                 if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5)
                 {
-                    NextCommandAt = Environment.TickCount64 + 3000;
+                    NextCommandAt = Environment.TickCount64 + 2000;
+                }
+                if(Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
+                {
+                    TeleportTo = (null, 0);
                 }
             }
         }
 
         private void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
         {
-            if(config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say) && TryDecodeSender(sender, out var s) && s.Name == P.config.CurrentConductor.Name && Svc.ClientState.TerritoryType.EqualsAny<ushort>(956, 957, 958, 959, 960, 961)) || P.config.Debug))
+            if(Svc.ClientState.LocalPlayer != null && config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say) && Svc.ClientState.TerritoryType.EqualsAny(ValidZones)) || P.config.Debug))
             {
+                var isMapLink = false;
+                var isConductorMessage = (P.config.Debug && sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString())) || (TryDecodeSender(sender, out var s) && s.Name == P.config.CurrentConductor.Name);
                 foreach (var x in message.Payloads)
                 {
                     if (x is MapLinkPayload m)
                     {
-                        var nearestAetheryte = GetNearestAetheryte(m);
-                        PluginLog.Debug($"{m}");
-                        if(m.TerritoryType.RowId != Svc.ClientState.TerritoryType && m.TerritoryType.RowId.EqualsAny<uint>(956, 957, 958, 959, 960, 961))
+                        isMapLink = true;
+                        if (isConductorMessage)
                         {
-                            TeleportTo = (nearestAetheryte, m.TerritoryType.RowId);
+                            var nearestAetheryte = GetNearestAetheryte(m);
+                            PluginLog.Debug($"{m}");
+                            if (m.TerritoryType.RowId.EqualsAny(ValidZones) || P.config.Debug)
+                            {
+                                if (m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
+                                {
+                                    if (P.config.AutoTeleport)
+                                    {
+                                        TeleportTo = (nearestAetheryte, m.TerritoryType.RowId);
+                                    }
+                                }
+                                else
+                                {
+                                    if (P.config.AutoOpenMap)
+                                    {
+                                        Svc.GameGui.OpenMapWithMapLink(m);
+                                    }
+                                }
+                            }
                         }
+                        break;
                     }
+                }
+                if(P.config.SuppressChatOtherPlayers && !isMapLink && !isConductorMessage)
+                {
+                    isHandled = true;
+                }
+                if (isConductorMessage)
+                {
+                    var msg = new SeStringBuilder();
+                    msg.AddUiForeground(578);
+                    foreach(var x in message.Payloads)
+                    {
+                        msg.Add(x);
+                    }
+                    msg.AddUiForegroundOff();
+                    message = msg.Build();
                 }
             }
         }
@@ -129,6 +176,7 @@ namespace HuntTrainAssistant
 
         public void Dispose()
         {
+            contextMenuManager.Dispose();
             Svc.Chat.ChatMessage -= Chat_ChatMessage;
             Svc.Framework.Update -= Framework_Update;
             Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;

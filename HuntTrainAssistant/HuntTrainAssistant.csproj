@@ -43,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\ECommons\ECommons\ECommons.csproj" />
+	  <ProjectReference Include="..\..\ECommons\ECommons\ECommons.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -76,9 +76,6 @@
 	<ItemGroup>
 		<None Update="HuntTrainAssistant.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="TextAdvance.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 </Project>
