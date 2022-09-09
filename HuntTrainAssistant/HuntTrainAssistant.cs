@@ -1,187 +1,71 @@
-﻿using Dalamud.Data;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using ECommons;
-using ECommons.SimpleGui;
-using Lumina.Excel.GeneratedSheets;
-using System.Diagnostics;
+﻿using ECommons.SimpleGui;
 
-namespace HuntTrainAssistant
+namespace HuntTrainAssistant;
+
+public class HuntTrainAssistant : IDalamudPlugin
 {
-    public class HuntTrainAssistant : IDalamudPlugin
+    internal static HuntTrainAssistant P;
+    internal Config config;
+    internal (string Name, uint Territory) TeleportTo = (null, 0);
+    internal long NextCommandAt = 0;
+    internal static ushort[] ValidZones = { 956, 957, 958, 959, 960, 961 };
+    internal static uint[] ValidZonesInt = { 956, 957, 958, 959, 960, 961 };
+    ContextMenuManager contextMenuManager;
+
+    public HuntTrainAssistant(DalamudPluginInterface pi)
     {
-        internal static HuntTrainAssistant P;
-        internal Config config;
-        internal (string Name, uint Territory) TeleportTo = (null, 0);
-        internal long NextCommandAt = 0;
-        internal static ushort[] ValidZones = { 956, 957, 958, 959, 960, 961 };
-        ContextMenuManager contextMenuManager;
+        P = this;
+        ECommons.ECommons.Init(pi);
+        config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
+        EzConfigGui.Init(this.Name, Gui.Draw, config);
+        EzCmd.Add("/hta", EzConfigGui.Open, "open plugin interface");
+        Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
+        Svc.Framework.Update += Framework_Update;
+        Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
+        contextMenuManager = new();
+    }
 
-        public HuntTrainAssistant(DalamudPluginInterface pi)
+    private void ClientState_TerritoryChanged(object sender, ushort e)
+    {
+        TeleportTo = (null, 0);
+        if (!e.EqualsAny(ValidZones))
         {
-            P = this;
-            ECommons.ECommons.Init(pi);
-            config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
-            ConfigGui.Init(this.Name, Gui.Draw, config);
-            EzCmd.Add("/hta", ConfigGui.Open, "open plugin interface");
-            Svc.Chat.ChatMessage += Chat_ChatMessage;
-            Svc.Framework.Update += Framework_Update;
-            Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
-            contextMenuManager = new();
+            P.config.CurrentConductor = new("", 0);
         }
+    }
 
-        private void ClientState_TerritoryChanged(object sender, ushort e)
+    private void Framework_Update(Dalamud.Game.Framework framework)
+    {
+        if (Svc.ClientState.LocalPlayer != null && TeleportTo.Territory != 0) 
         {
-            TeleportTo = (null, 0);
-            if (!e.EqualsAny(ValidZones))
+            if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting])
             {
-                P.config.CurrentConductor = new("", 0);
-            }
-        }
-
-        private void Framework_Update(Dalamud.Game.Framework framework)
-        {
-            if (Svc.ClientState.LocalPlayer != null && TeleportTo.Territory != 0) 
-            {
-                if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting])
+                if (Environment.TickCount64 > NextCommandAt)
                 {
-                    if (Environment.TickCount64 > NextCommandAt)
-                    {
-                        NextCommandAt = Environment.TickCount64 + 500;
-                        Svc.Commands.ProcessCommand($"/tp {TeleportTo.Name}");
-                    }
-                }
-                if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5)
-                {
-                    NextCommandAt = Environment.TickCount64 + 2000;
-                }
-                if(Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
-                {
-                    TeleportTo = (null, 0);
+                    NextCommandAt = Environment.TickCount64 + 500;
+                    Svc.Commands.ProcessCommand($"/tp {TeleportTo.Name}");
                 }
             }
-        }
-
-        private void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
-        {
-            if(Svc.ClientState.LocalPlayer != null && config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say) && Svc.ClientState.TerritoryType.EqualsAny(ValidZones)) || P.config.Debug))
+            if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5 && !Svc.Condition[ConditionFlag.Casting])
             {
-                var isMapLink = false;
-                var isConductorMessage = (P.config.Debug && sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString())) || (TryDecodeSender(sender, out var s) && s.Name == P.config.CurrentConductor.Name);
-                foreach (var x in message.Payloads)
-                {
-                    if (x is MapLinkPayload m)
-                    {
-                        isMapLink = true;
-                        if (isConductorMessage)
-                        {
-                            var nearestAetheryte = GetNearestAetheryte(m);
-                            PluginLog.Debug($"{m}");
-                            if (m.TerritoryType.RowId.EqualsAny(ValidZones) || P.config.Debug)
-                            {
-                                if (m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
-                                {
-                                    if (P.config.AutoTeleport)
-                                    {
-                                        TeleportTo = (nearestAetheryte, m.TerritoryType.RowId);
-                                    }
-                                }
-                                else
-                                {
-                                    if (P.config.AutoOpenMap)
-                                    {
-                                        Svc.GameGui.OpenMapWithMapLink(m);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-                if(P.config.SuppressChatOtherPlayers && !isMapLink && !isConductorMessage)
-                {
-                    isHandled = true;
-                }
-                if (isConductorMessage)
-                {
-                    var msg = new SeStringBuilder();
-                    msg.AddUiForeground(578);
-                    foreach(var x in message.Payloads)
-                    {
-                        msg.Add(x);
-                    }
-                    msg.AddUiForegroundOff();
-                    message = msg.Build();
-                }
+                NextCommandAt = Environment.TickCount64 + 2000;
+            }
+            if(Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
+            {
+                TeleportTo = (null, 0);
             }
         }
+    }
 
-        public string GetNearestAetheryte(MapLinkPayload maplinkMessage)
-        {
-            string aetheryteName = "";
-            double distance = 0;
-            foreach (var data in Svc.Data.GetExcelSheet<Aetheryte>())
-            {
-                if (!data.IsAetheryte) continue;
-                if (data.Territory.Value == null) continue;
-                if (data.PlaceName.Value == null) continue;
-                var place = Svc.Data.GetExcelSheet<Map>().FirstOrDefault(m => m.TerritoryType.Row == maplinkMessage.TerritoryType.RowId);
-                var scale = place.SizeFactor;
-                if (data.Territory.Value.RowId == maplinkMessage.TerritoryType.RowId)
-                {
-                    var mapMarker = Svc.Data.GetExcelSheet<MapMarker>().FirstOrDefault(m => (m.DataType == 3 && m.DataKey == data.RowId));
-                    if (mapMarker == null)
-                    {
-                        DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");
-                        continue;
-                    }
-                    var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.X, scale);
-                    var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale);
-                    PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX} ,{AethersY})");
-                    double temp_distance = Math.Pow(AethersX - maplinkMessage.XCoord, 2) + Math.Pow(AethersY - maplinkMessage.YCoord, 2);
-                    if (aetheryteName == "" || temp_distance < distance)
-                    {
-                        distance = temp_distance;
-                        aetheryteName = data.PlaceName.Value.Name;
-                    }
-                }
-            }
-            return aetheryteName;
-        }
+    public string Name => "HuntTrainAssistant";
 
-        float ConvertMapMarkerToMapCoordinate(int pos, float scale)
-        {
-            float num = scale / 100f;
-            var rawPosition = (int)((float)(pos - 1024.0) / num * 1000f);
-            return ConvertRawPositionToMapCoordinate(rawPosition, scale);
-        }
-
-        float ConvertRawPositionToMapCoordinate(int pos, float scale)
-        {
-            float num = scale / 100f;
-            return (float)((pos / 1000f * num + 1024.0) / 2048.0 * 41.0 / num + 1.0);
-        }
-
-        double ToMapCoordinate(double val, float scale)
-        {
-            var c = scale / 100.0;
-
-            val *= c;
-            return ((41.0 / c) * ((val + 1024.0) / 2048.0)) + 1;
-        }
-
-        public string Name => "HuntTrainAssistant";
-
-        public void Dispose()
-        {
-            contextMenuManager.Dispose();
-            Svc.Chat.ChatMessage -= Chat_ChatMessage;
-            Svc.Framework.Update -= Framework_Update;
-            Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
-            ECommons.ECommons.Dispose();
-            P = null;
-        }
+    public void Dispose()
+    {
+        contextMenuManager.Dispose();
+        Svc.Chat.ChatMessage -= ChatMessageHandler.Chat_ChatMessage;
+        Svc.Framework.Update -= Framework_Update;
+        Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
+        ECommons.ECommons.Dispose();
+        P = null;
     }
 }
