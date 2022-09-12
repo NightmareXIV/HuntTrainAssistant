@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.Text.SeStringHandling.Payloads;
+using ECommons.Logging;
 using Lumina.Excel.GeneratedSheets;
 
 namespace HuntTrainAssistant;
