@@ -57,5 +57,6 @@ internal unsafe static class Gui
         ImGuiEx.Text($"X: {MapFlag.Instance()->X}");
         ImGuiEx.Text($"Y: {MapFlag.Instance()->Y}");
         ImGuiEx.Text($"Territory: {GenericHelpers.GetTerritoryName(MapFlag.Instance()->TerritoryType)}");
+        ImGuiEx.Text($"Is moving: {P.IsMoving}");
     }
 }

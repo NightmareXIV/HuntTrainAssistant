@@ -15,24 +15,26 @@ internal static class MapManager
             if (!data.IsAetheryte) continue;
             if (data.Territory.Value == null) continue;
             if (data.PlaceName.Value == null) continue;
-            var place = Svc.Data.GetExcelSheet<Map>().FirstOrDefault(m => m.TerritoryType.Row == maplinkMessage.TerritoryType.RowId);
-            var scale = place.SizeFactor;
-            if (data.Territory.Value.RowId == maplinkMessage.TerritoryType.RowId)
+            if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(m => m.TerritoryType.Row == maplinkMessage.TerritoryType.RowId, out var place))
             {
-                var mapMarker = Svc.Data.GetExcelSheet<MapMarker>().FirstOrDefault(m => (m.DataType == 3 && m.DataKey == data.RowId));
-                if (mapMarker == null)
+                var scale = place.SizeFactor;
+                if (data.Territory.Value.RowId == maplinkMessage.TerritoryType.RowId)
                 {
-                    DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");
-                    continue;
-                }
-                var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.X, scale);
-                var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale);
-                PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX} ,{AethersY})");
-                double temp_distance = Math.Pow(AethersX - maplinkMessage.XCoord, 2) + Math.Pow(AethersY - maplinkMessage.YCoord, 2);
-                if (aetheryteName == "" || temp_distance < distance)
-                {
-                    distance = temp_distance;
-                    aetheryteName = data.PlaceName.Value.Name;
+                    var mapMarker = Svc.Data.GetExcelSheet<MapMarker>().FirstOrDefault(m => (m.DataType == 3 && m.DataKey == data.RowId));
+                    if (mapMarker == null)
+                    {
+                        DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");
+                        continue;
+                    }
+                    var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.X, scale);
+                    var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale);
+                    PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX} ,{AethersY})");
+                    double temp_distance = Math.Pow(AethersX - maplinkMessage.XCoord, 2) + Math.Pow(AethersY - maplinkMessage.YCoord, 2);
+                    if (aetheryteName == "" || temp_distance < distance)
+                    {
+                        distance = temp_distance;
+                        aetheryteName = data.PlaceName.Value.Name;
+                    }
                 }
             }
         }

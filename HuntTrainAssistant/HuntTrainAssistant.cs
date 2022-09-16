@@ -19,7 +19,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     public HuntTrainAssistant(DalamudPluginInterface pi)
     {
         P = this;
-        ECommons.ECommons.Init(pi, this);
+        ECommons.ECommons.Init(pi, this, Module.DalamudReflector);
         config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
         EzConfigGui.Init(this.Name, Gui.Draw, config);
         EzCmd.Add("/hta", EzConfigGui.Open, "open plugin interface");
@@ -42,7 +42,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     {
         if (Svc.ClientState.LocalPlayer != null && TeleportTo.Territory != 0 && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
-            if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting])
+            if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
             {
                 if (Environment.TickCount64 > NextCommandAt)
                 {
@@ -50,14 +50,23 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                     Svc.Commands.ProcessCommand($"/tp {TeleportTo.Name}");
                 }
             }
-            if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5 && !Svc.Condition[ConditionFlag.Casting])
+            if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5)
             {
-                NextCommandAt = Environment.TickCount64 + 2000;
+                if (!Svc.Condition[ConditionFlag.Casting])
+                {
+                    NextCommandAt = Environment.TickCount64 + 2000;
+                }
+                else
+                {
+                    NextCommandAt = Environment.TickCount64 + 500;
+                }
             }
             if(Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
             {
                 TeleportTo = (null, 0);
             }
+            IsMoving = Svc.ClientState.LocalPlayer.Position != LastPosition;
+            LastPosition = Svc.ClientState.LocalPlayer.Position;
         }
     }
 
