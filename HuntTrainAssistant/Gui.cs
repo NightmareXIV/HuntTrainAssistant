@@ -9,6 +9,7 @@ internal unsafe static class Gui
         ImGuiEx.EzTabBar("HTA",
             ("Current", Control, null, true),
             ("Settings", General, null, true),
+            //("Help", Help, null, true),
             ("Debug", Debug, ImGuiColors.DalamudGrey3, true),
             ("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false),
             ("Contribute", Donation.DonationTabDraw, ImGuiColors.ParsedGold, true)
@@ -19,23 +20,35 @@ internal unsafe static class Gui
     {
         ImGui.SetNextItemWidth(150f);
         var cond = P.config.CurrentConductor.Name;
-        if (ImGui.InputText("Current conductor", ref cond, 50))
+        ImGuiEx.Text("Current conductor:");
+        ImGui.SameLine();
+        if (ImGui.SmallButton("Clear"))
+        {
+            P.config.CurrentConductor = new("", 0);
+        }
+        ImGuiEx.SetNextItemFullWidth();
+        if (ImGui.InputText("##curcond", ref cond, 50))
         {
             P.config.CurrentConductor = new(cond, 0);
         }
         if (P.TeleportTo.Territory == 0)
         {
             ImGuiEx.Text("Autoteleport: inactive");
+            if(ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte}"))
+            {
+                P.TeleportTo = ChatMessageHandler.LastMessageLoc;
+            }
         }
         else
         {
-            ImGuiEx.Text($"Autoteleport destination: {P.TeleportTo.Name}@{GenericHelpers.GetTerritoryName(P.TeleportTo.Territory)}");
+            ImGuiEx.Text($"Autoteleport active.");
             ImGui.SameLine();
             if (ImGui.SmallButton("Cancel"))
             {
                 P.TeleportTo.Territory = 0;
                 P.TeleportTo.Name = "";
             }
+            ImGuiEx.Text($"{P.TeleportTo.Name}@{GenericHelpers.GetTerritoryName(P.TeleportTo.Territory)}");
         }
     }
 
@@ -45,7 +58,7 @@ internal unsafe static class Gui
         ImGui.SameLine();
         ImGui.Checkbox("Debug mode", ref P.config.Debug);
         ImGui.Checkbox("Autoteleport to different zone", ref P.config.AutoTeleport);
-        ImGui.Checkbox("Auto-open map on same zone", ref P.config.AutoOpenMap);
+        ImGui.Checkbox("Auto-open map when new location is linked", ref P.config.AutoOpenMap);
         ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.config.SuppressChatOtherPlayers);
         //ImGui.SetNextItemWidth(60f);
         //ImGui.DragFloat("Autoteleport aetheryte distance multiplier", ref P.config.AutoTeleportAetheryteDistanceDiff);
@@ -58,5 +71,11 @@ internal unsafe static class Gui
         ImGuiEx.Text($"Y: {MapFlag.Instance()->Y}");
         ImGuiEx.Text($"Territory: {GenericHelpers.GetTerritoryName(MapFlag.Instance()->TerritoryType)}");
         ImGuiEx.Text($"Is moving: {P.IsMoving}");
+    }
+
+    static void Help()
+    {
+        ImGuiEx.TextWrapped("- Be in one of Endwalker hunt zones;");
+        ImGuiEx.TextWrapped("- Assign conductor either by right-clicking them in chat/world or enter their name manually;");
     }
 }

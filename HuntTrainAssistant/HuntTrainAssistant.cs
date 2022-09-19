@@ -1,4 +1,5 @@
 ﻿using ECommons.GameFunctions;
+using ECommons.Reflection;
 using ECommons.SimpleGui;
 
 namespace HuntTrainAssistant;
@@ -22,6 +23,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         ECommons.ECommons.Init(pi, this, Module.DalamudReflector);
         config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
         EzConfigGui.Init(this.Name, Gui.Draw, config);
+        EzConfigGui.Window.RespectCloseHotkey = false;
         EzCmd.Add("/hta", EzConfigGui.Open, "open plugin interface");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
@@ -80,5 +82,16 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
         ECommons.ECommons.Dispose();
         P = null;
+    }
+
+    internal static void TryNotify(string s)
+    {
+        if (DalamudReflector.TryGetDalamudPlugin("NotificationMaster", out var instance, true, true))
+        {
+            Safe(delegate
+            {
+                instance.GetType().Assembly.GetType("NotificationMaster.TrayIconManager", true).GetMethod("ShowToast").Invoke(null, new object[] { s, "HuntTrainAssistant" });
+            });
+        }
     }
 }

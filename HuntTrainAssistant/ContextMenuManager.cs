@@ -1,6 +1,7 @@
 ﻿using Dalamud.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.ChatMethods;
+using ECommons.SimpleGui;
 
 namespace HuntTrainAssistant;
 
@@ -56,5 +57,6 @@ internal class ContextMenuManager
         var world = args.ObjectWorld;
         var s = new Sender(player, world);
         P.config.CurrentConductor = s;
+        EzConfigGui.Open();
     }
 }

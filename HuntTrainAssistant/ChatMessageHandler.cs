@@ -2,14 +2,16 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text;
 using Lumina.Excel.GeneratedSheets;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 
 namespace HuntTrainAssistant;
 
 internal unsafe static class ChatMessageHandler
 {
+    internal static (string Aetheryte, uint Territory) LastMessageLoc = (null, 0);
     internal static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (Svc.ClientState.LocalPlayer != null && P.config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say) && Svc.ClientState.TerritoryType.EqualsAny(ValidZones)) || P.config.Debug))
+        if (Svc.ClientState.LocalPlayer != null && P.config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote) && Svc.ClientState.TerritoryType.EqualsAny(ValidZones)) || P.config.Debug))
         {
             var isMapLink = false;
             var isConductorMessage = (P.config.Debug && (sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString()) || type == XivChatType.Echo)) || (TryDecodeSender(sender, out var s) && s.Name == P.config.CurrentConductor.Name);
@@ -22,7 +24,7 @@ internal unsafe static class ChatMessageHandler
                     if (isConductorMessage)
                     {
                         var nearestAetheryte = MapManager.GetNearestAetheryte(m);
-                        PluginLog.Debug($"{m}");
+                        //PluginLog.Debug($"{m}");
                         if (m.TerritoryType.RowId.EqualsAny(ValidZonesInt) || P.config.Debug)
                         {
                             if (m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
@@ -39,7 +41,7 @@ internal unsafe static class ChatMessageHandler
                                 {
                                     if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(x => x.TerritoryType.Row == m.TerritoryType.RowId, out var place))
                                     {
-                                        var pos = new Vector2(MapManager.ConvertMapMarkerToMapCoordinate(m.RawX, place.SizeFactor), MapManager.ConvertMapMarkerToMapCoordinate(m.RawY, place.SizeFactor));
+                                        var pos = new Vector2(m.RawX / 1000, m.RawY / 1000);
                                         var distance = Vector2.Distance(new(MapFlag.Instance()->X, MapFlag.Instance()->Y), pos);
                                         PluginLog.Information($"Distance between map marker and linked position is {distance}");
                                         if(distance > 10)
@@ -52,6 +54,7 @@ internal unsafe static class ChatMessageHandler
                                 {
                                     Svc.GameGui.OpenMapWithMapLink(m);
                                 }
+                                LastMessageLoc = (MapManager.GetNearestAetheryte(m), m.TerritoryType.RowId);
                             }
                         }
                     }
@@ -72,6 +75,10 @@ internal unsafe static class ChatMessageHandler
                 }
                 msg.AddUiForegroundOff();
                 message = msg.Build();
+                if (Framework.Instance()->WindowInactive || P.config.Debug)
+                {
+                    TryNotify($"{message.ExtractText()}");
+                }
             }
         }
     }
