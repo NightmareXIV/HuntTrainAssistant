@@ -1,11 +1,11 @@
 ﻿{
-  "Author": "Eternita",
+  "Author": "NightmareXIV",
   "Name": "HuntTrainAssistant",
   "InternalName": "HuntTrainAssistant",
   "AssemblyVersion": "9.0.0.0",
   "Description": "Hunt train assistance tool.",
   "ApplicableVersion": "any",
   "RepoUrl": "https://github.com/NightmareXIV/HuntTrainAssistant",
-  "DalamudApiLevel": 7,
+  "DalamudApiLevel": 8,
   "LoadPriority": 0
 }

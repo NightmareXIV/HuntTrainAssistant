@@ -20,9 +20,9 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     public HuntTrainAssistant(DalamudPluginInterface pi)
     {
         P = this;
-        ECommons.ECommons.Init(pi, this, Module.DalamudReflector);
+        ECommonsMain.Init(pi, this, Module.DalamudReflector);
         config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
-        EzConfigGui.Init(this.Name, Gui.Draw, config);
+        EzConfigGui.Init(Gui.Draw, config);
         EzConfigGui.Window.RespectCloseHotkey = false;
         EzCmd.Add("/hta", EzConfigGui.Open, "open plugin interface");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
@@ -80,7 +80,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Svc.Chat.ChatMessage -= ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update -= Framework_Update;
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
-        ECommons.ECommons.Dispose();
+        ECommonsMain.Dispose();
         P = null;
     }
 
