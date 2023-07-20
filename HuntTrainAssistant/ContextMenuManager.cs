@@ -31,7 +31,7 @@ internal class ContextMenuManager
     {
         contextMenu = new();
         openMessenger = new GameObjectContextMenuItem(
-            new SeStringBuilder().AddUiForeground("Set as conductor", 578).Build(), AssignConductor);
+            new SeStringBuilder().AddUiForeground("Add as conductor", 578).Build(), AssignConductor);
         contextMenu.OnOpenGameObjectContextMenu += OpenContextMenu;
     }
 
@@ -56,7 +56,7 @@ internal class ContextMenuManager
         var player = args.Text.ToString();
         var world = args.ObjectWorld;
         var s = new Sender(player, world);
-        P.config.CurrentConductor = s;
+        P.config.Conductors.Add(s);
         EzConfigGui.Open();
     }
 }

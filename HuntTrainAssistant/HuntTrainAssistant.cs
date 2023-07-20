@@ -36,7 +36,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         TeleportTo = (null, 0);
         if (!e.EqualsAny(ValidZones))
         {
-            P.config.CurrentConductor = new("", 0);
+            P.config.Conductors.Clear();
         }
     }
 
