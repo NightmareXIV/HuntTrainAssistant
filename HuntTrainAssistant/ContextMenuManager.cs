@@ -29,7 +29,7 @@ internal class ContextMenuManager
 
     internal ContextMenuManager()
     {
-        contextMenu = new();
+        contextMenu = new(Svc.PluginInterface);
         openMessenger = new GameObjectContextMenuItem(
             new SeStringBuilder().AddUiForeground("Set as conductor", 578).Build(), AssignConductor);
         contextMenu.OnOpenGameObjectContextMenu += OpenContextMenu;
