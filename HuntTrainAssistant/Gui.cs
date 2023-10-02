@@ -12,8 +12,14 @@ internal unsafe static class Gui
             //("Help", Help, null, true),
             ("Debug", Debug, ImGuiColors.DalamudGrey3, true),
             ("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false),
-            ("Contribute", Donation.DonationTabDraw, ImGuiColors.ParsedGold, true)
+            ("Ko-Fi", KoFi, EColor.BlueSky, true)
             );
+    }
+
+    static void KoFi()
+    {
+        ImGuiEx.TextWrapped($"If you like this plugin and would like to donate, please use the button below. Thank you!");
+        KoFiButton.DrawRaw();
     }
 
     static void Control()

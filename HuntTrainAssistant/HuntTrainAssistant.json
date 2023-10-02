@@ -1,11 +1,11 @@
 ﻿{
-  "Author": "NightmareXIV",
-  "Name": "HuntTrainAssistant",
-  "InternalName": "HuntTrainAssistant",
-  "AssemblyVersion": "9.0.0.0",
-  "Description": "Hunt train assistance tool.",
-  "ApplicableVersion": "any",
-  "RepoUrl": "https://github.com/NightmareXIV/HuntTrainAssistant",
-  "DalamudApiLevel": 8,
-  "LoadPriority": 0
+    "Author": "NightmareXIV",
+    "Name": "HuntTrainAssistant",
+    "InternalName": "HuntTrainAssistant",
+    "Punchline": "[beta] Hunt train assistance tool.",
+    "Description": "Provides useful tools for hunt trains such as: highlighting conductor messages and muting all other chat, auto-opening flags from conductors and auto-teleporting to announced destination. ",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/NightmareXIV/HuntTrainAssistant",
+    "DalamudApiLevel": 8,
+    "LoadPriority": 0
 }

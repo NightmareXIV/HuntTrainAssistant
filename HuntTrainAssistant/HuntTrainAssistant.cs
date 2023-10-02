@@ -31,7 +31,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         contextMenuManager = new();
     }
 
-    private void ClientState_TerritoryChanged(object sender, ushort e)
+    private void ClientState_TerritoryChanged(ushort e)
     {
         TeleportTo = (null, 0);
         if (!e.EqualsAny(ValidZones))
@@ -40,7 +40,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
     }
 
-    private void Framework_Update(Dalamud.Game.Framework framework)
+    private void Framework_Update(object framework)
     {
         if (Svc.ClientState.LocalPlayer != null && TeleportTo.Territory != 0 && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
