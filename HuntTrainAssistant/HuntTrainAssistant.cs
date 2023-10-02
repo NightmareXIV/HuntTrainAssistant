@@ -10,8 +10,8 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     internal Config config;
     internal (string Name, uint Territory) TeleportTo = (null, 0);
     internal long NextCommandAt = 0;
-    internal static ushort[] ValidZones = { 956, 957, 958, 959, 960, 961 };
-    internal static uint[] ValidZonesInt = { 956, 957, 958, 959, 960, 961 };
+    internal static ushort[] ValidZones = { 612, 613, 614, 620, 621, 622, 648, 813, 814, 815, 816, 817, 818, 956, 957, 958, 959, 960, 961 };
+    internal static uint[] ValidZonesInt = { 612, 613, 614, 620, 621, 622, 648, 813, 814, 815, 816, 817, 818, 956, 957, 958, 959, 960, 961 };
     ContextMenuManager contextMenuManager;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
