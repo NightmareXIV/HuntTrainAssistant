@@ -11,7 +11,6 @@ internal class Config : IPluginConfiguration
     public float AutoTeleportAetheryteDistanceDiff = 3f;
     public bool SuppressChatOtherPlayers = true;
     public List<Sender> Conductors = new();
-    public Sender CurrentConductor = new("", 0);
     public bool Debug = false;
     public bool AutoOpenMap = true;
 }

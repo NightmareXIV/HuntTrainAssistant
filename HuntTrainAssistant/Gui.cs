@@ -25,17 +25,35 @@ internal unsafe static class Gui
     static void Control()
     {
         ImGui.SetNextItemWidth(150f);
-        var cond = P.config.CurrentConductor.Name;
-        ImGuiEx.Text("Current conductor:");
+        var condIndex = 0;
+        var condNames = P.config.Conductors.Select(x => x.Name).ToArray();
+        ImGuiEx.Text("Current conductors:");
         ImGui.SameLine();
         if (ImGui.SmallButton("Clear"))
         {
-            P.config.CurrentConductor = new("", 0);
+            P.config.Conductors.Clear();
         }
         ImGuiEx.SetNextItemFullWidth();
-        if (ImGui.InputText("##curcond", ref cond, 50))
+        ImGui.ListBox("##conds", ref condIndex, condNames, condNames.Length, 3);
+        ImGuiEx.Text("Add conductor:");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(150f);
+        var newCond = "";
+        if (ImGui.InputText("##newCond", ref newCond, 50, ImGuiInputTextFlags.EnterReturnsTrue))
         {
-            P.config.CurrentConductor = new(cond, 0);
+            if (newCond.Length > 0)
+            {
+                P.config.Conductors.Add(new(newCond, 0));
+                newCond = "";
+            }
+        }
+        // Remove selected conductor
+        if (ImGui.Button("Remove selected conductor"))
+        {
+            if (condIndex >= 0 && condIndex < P.config.Conductors.Count)
+            {
+                P.config.Conductors.RemoveAt(condIndex);
+            }
         }
         if (P.TeleportTo.Territory == 0)
         {
@@ -82,6 +100,6 @@ internal unsafe static class Gui
     static void Help()
     {
         ImGuiEx.TextWrapped("- Be in one of Endwalker hunt zones;");
-        ImGuiEx.TextWrapped("- Assign conductor either by right-clicking them in chat/world or enter their name manually;");
+        ImGuiEx.TextWrapped("- Assign conductors either by right-clicking them in chat/world or enter their names manually;");
     }
 }
