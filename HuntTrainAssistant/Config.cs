@@ -13,4 +13,5 @@ internal class Config : IPluginConfiguration
     public List<Sender> Conductors = new();
     public bool Debug = false;
     public bool AutoOpenMap = true;
+    public bool DistanceCompensationHack = false;
 }

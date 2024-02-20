@@ -85,6 +85,7 @@ internal unsafe static class Gui
         ImGui.Checkbox("Autoteleport to different zone", ref P.config.AutoTeleport);
         ImGui.Checkbox("Auto-open map when new location is linked", ref P.config.AutoOpenMap);
         ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.config.SuppressChatOtherPlayers);
+        ImGui.Checkbox("Compensate for some aetherytes' position", ref P.config.DistanceCompensationHack);
         //ImGui.SetNextItemWidth(60f);
         //ImGui.DragFloat("Autoteleport aetheryte distance multiplier", ref P.config.AutoTeleportAetheryteDistanceDiff);
     }
