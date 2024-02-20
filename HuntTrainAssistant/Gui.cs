@@ -33,6 +33,15 @@ internal unsafe static class Gui
         {
             P.config.Conductors.Clear();
         }
+        ImGui.SameLine();
+        // Remove selected conductor
+        if (ImGui.SmallButton("Remove selected"))
+        {
+            if (condIndex >= 0 && condIndex < P.config.Conductors.Count)
+            {
+                P.config.Conductors.RemoveAt(condIndex);
+            }
+        }
         ImGuiEx.SetNextItemFullWidth();
         ImGui.ListBox("##conds", ref condIndex, condNames, condNames.Length, 3);
         ImGuiEx.Text("Add conductor:");
@@ -45,14 +54,6 @@ internal unsafe static class Gui
             {
                 P.config.Conductors.Add(new(newCond, 0));
                 newCond = "";
-            }
-        }
-        // Remove selected conductor
-        if (ImGui.Button("Remove selected conductor"))
-        {
-            if (condIndex >= 0 && condIndex < P.config.Conductors.Count)
-            {
-                P.config.Conductors.RemoveAt(condIndex);
             }
         }
         if (P.TeleportTo.Territory == 0)
