@@ -15,7 +15,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     ContextMenuManager contextMenuManager;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
-    
+
 
     public HuntTrainAssistant(DalamudPluginInterface pi)
     {
@@ -24,7 +24,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
         EzConfigGui.Init(Gui.Draw, config);
         EzConfigGui.Window.RespectCloseHotkey = false;
-        EzCmd.Add("/hta", EzConfigGui.Open, "open plugin interface");
+        EzCmd.Add("/hta", OnChatCommand, "toggle plugin interface\n/hta clear: clear current conductors\n/hta <player name>: add new conductor");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
@@ -92,6 +92,27 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
             {
                 instance.GetType().Assembly.GetType("NotificationMaster.TrayIconManager", true).GetMethod("ShowToast").Invoke(null, new object[] { s, "HuntTrainAssistant" });
             });
+        }
+    }
+    private void OnChatCommand(string command, string arguments)
+    {
+        arguments = arguments.Trim();
+
+        if (arguments == string.Empty)
+        {
+            EzConfigGui.Window.Toggle();
+        }
+        else if (arguments.StartsWith("clear"))
+        {
+            P.config.Conductors.Clear();
+        }
+        else
+        {
+            if (arguments.StartsWith("add "))
+                arguments = arguments[4..].Trim();
+            if (!P.config.Conductors.Contains(new(arguments, 0)))
+                P.config.Conductors.Add(new(arguments, 0));
+            EzConfigGui.Open();
         }
     }
 }
