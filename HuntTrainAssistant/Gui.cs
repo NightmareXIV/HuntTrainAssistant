@@ -33,6 +33,15 @@ internal unsafe static class Gui
         {
             P.config.Conductors.Clear();
         }
+        ImGui.SameLine();
+        // Remove selected conductor
+        if (ImGui.SmallButton("Remove selected"))
+        {
+            if (condIndex >= 0 && condIndex < P.config.Conductors.Count)
+            {
+                P.config.Conductors.RemoveAt(condIndex);
+            }
+        }
         ImGuiEx.SetNextItemFullWidth();
         ImGui.ListBox("##conds", ref condIndex, condNames, condNames.Length, 3);
         ImGuiEx.Text("Add conductor:");
@@ -45,14 +54,6 @@ internal unsafe static class Gui
             {
                 P.config.Conductors.Add(new(newCond, 0));
                 newCond = "";
-            }
-        }
-        // Remove selected conductor
-        if (ImGui.Button("Remove selected conductor"))
-        {
-            if (condIndex >= 0 && condIndex < P.config.Conductors.Count)
-            {
-                P.config.Conductors.RemoveAt(condIndex);
             }
         }
         if (P.TeleportTo.Territory == 0)
@@ -84,6 +85,7 @@ internal unsafe static class Gui
         ImGui.Checkbox("Autoteleport to different zone", ref P.config.AutoTeleport);
         ImGui.Checkbox("Auto-open map when new location is linked", ref P.config.AutoOpenMap);
         ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.config.SuppressChatOtherPlayers);
+        ImGui.Checkbox("Compensate for some aetherytes' position", ref P.config.DistanceCompensationHack);
         //ImGui.SetNextItemWidth(60f);
         //ImGui.DragFloat("Autoteleport aetheryte distance multiplier", ref P.config.AutoTeleportAetheryteDistanceDiff);
     }

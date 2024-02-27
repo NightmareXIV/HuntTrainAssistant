@@ -10,6 +10,7 @@ internal static class MapManager
     {
         string aetheryteName = "";
         double distance = 0;
+        PluginLog.Debug($"Link: {maplinkMessage.PlaceName} ({maplinkMessage.XCoord:0.00} : {maplinkMessage.YCoord:0.00})");
         foreach (var data in Svc.Data.GetExcelSheet<Aetheryte>())
         {
             if (!data.IsAetheryte) continue;
@@ -26,10 +27,11 @@ internal static class MapManager
                         DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");
                         continue;
                     }
-                    var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.X, scale);
-                    var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale);
-                    PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX} ,{AethersY})");
+                    Vector2 compensationDelta = getDistanceCompensationHackDelta(data.PlaceName.Value.Name);
+                    var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.X, scale) + compensationDelta.X;
+                    var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale) + compensationDelta.Y;
                     double temp_distance = Math.Pow(AethersX - maplinkMessage.XCoord, 2) + Math.Pow(AethersY - maplinkMessage.YCoord, 2);
+                    PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX:0.00}, {AethersY:0.00}), distance to flag: {temp_distance:0.00}");
                     if (aetheryteName == "" || temp_distance < distance)
                     {
                         distance = temp_distance;
@@ -39,6 +41,41 @@ internal static class MapManager
             }
         }
         return aetheryteName;
+    }
+
+    internal static Vector2 getDistanceCompensationHackDelta(string AetheryteName)
+    {
+        float X = 0f;
+        float Y = 0f;
+        if (P.config.DistanceCompensationHack)
+        {
+            // Distance hacks to account for Aetheryte's Z value (or weird exits like Tertium)
+            switch (AetheryteName)
+            {
+                case "Tertium":
+                    // only two spawn points are actually close enough to it
+                    Y -= 5f;
+                    break;
+                case "Base Omicron":
+                    // no spawn points closest to it compared to other two aetherytes
+                    X += 5f;
+                    break;
+                case "Bestways Burrow":
+                    // height difference only makes it closer to two points
+                    Y -= 3f;
+                    X -= 2f;
+                    break;
+                case "The Great Work":
+                    // one spawn point is closer to it than Palaka accounting for height
+                    Y -= 2f;
+                    break;
+            }
+        }
+        return new Vector2()
+        {
+            X = X,
+            Y = Y
+        };
     }
 
     internal static float ConvertMapMarkerToMapCoordinate(int pos, float scale)
