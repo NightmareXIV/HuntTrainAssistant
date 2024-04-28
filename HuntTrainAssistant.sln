@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.32804.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuntTrainAssistant", "HuntTrainAssistant\HuntTrainAssistant.csproj", "{0FA0B36E-6565-4082-9CDD-F5228DC8956D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuntTrainAssistant", "HuntTrainAssistant\HuntTrainAssistant.csproj", "{0FA0B36E-6565-4082-9CDD-F5228DC8956D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommons", "..\ECommons\ECommons\ECommons.csproj", "{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}"
 EndProject
@@ -15,8 +15,8 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Debug|Any CPU.Build.0 = Debug|x64
 		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Debug|x64.ActiveCfg = Debug|x64
 		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Debug|x64.Build.0 = Debug|x64
 		{0FA0B36E-6565-4082-9CDD-F5228DC8956D}.Release|Any CPU.ActiveCfg = Release|x64
@@ -27,8 +27,8 @@ Global
 		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Debug|Any CPU.Build.0 = Debug|x64
 		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Debug|x64.ActiveCfg = Debug|x64
 		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Debug|x64.Build.0 = Debug|x64
-		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Release|Any CPU.ActiveCfg = Release|x64
-		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Release|Any CPU.Build.0 = Release|x64
+		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Release|Any CPU.ActiveCfg = ReleaseForms|x64
+		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Release|Any CPU.Build.0 = ReleaseForms|x64
 		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Release|x64.ActiveCfg = Release|x64
 		{97C4AC6D-EEE4-44C4-878C-1912E62A6EE1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
