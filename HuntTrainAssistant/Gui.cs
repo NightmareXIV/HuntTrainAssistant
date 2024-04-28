@@ -25,17 +25,36 @@ internal unsafe static class Gui
     static void Control()
     {
         ImGui.SetNextItemWidth(150f);
-        var cond = P.config.CurrentConductor.Name;
-        ImGuiEx.Text("Current conductor:");
+        var condIndex = 0;
+        var condNames = P.config.Conductors.Select(x => x.Name).ToArray();
+        ImGuiEx.Text("Current conductors:");
         ImGui.SameLine();
         if (ImGui.SmallButton("Clear"))
         {
-            P.config.CurrentConductor = new("", 0);
+            P.config.Conductors.Clear();
+        }
+        ImGui.SameLine();
+        // Remove selected conductor
+        if (ImGui.SmallButton("Remove selected"))
+        {
+            if (condIndex >= 0 && condIndex < P.config.Conductors.Count)
+            {
+                P.config.Conductors.RemoveAt(condIndex);
+            }
         }
         ImGuiEx.SetNextItemFullWidth();
-        if (ImGui.InputText("##curcond", ref cond, 50))
+        ImGui.ListBox("##conds", ref condIndex, condNames, condNames.Length, 3);
+        ImGuiEx.Text("Add conductor:");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(150f);
+        var newCond = "";
+        if (ImGui.InputText("##newCond", ref newCond, 50, ImGuiInputTextFlags.EnterReturnsTrue))
         {
-            P.config.CurrentConductor = new(cond, 0);
+            if (newCond.Length > 0)
+            {
+                P.config.Conductors.Add(new(newCond, 0));
+                newCond = "";
+            }
         }
         if (P.TeleportTo.Territory == 0)
         {
@@ -66,6 +85,7 @@ internal unsafe static class Gui
         ImGui.Checkbox("Autoteleport to different zone", ref P.config.AutoTeleport);
         ImGui.Checkbox("Auto-open map when new location is linked", ref P.config.AutoOpenMap);
         ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.config.SuppressChatOtherPlayers);
+        ImGui.Checkbox("Compensate for some aetherytes' position", ref P.config.DistanceCompensationHack);
         //ImGui.SetNextItemWidth(60f);
         //ImGui.DragFloat("Autoteleport aetheryte distance multiplier", ref P.config.AutoTeleportAetheryteDistanceDiff);
     }
@@ -82,6 +102,6 @@ internal unsafe static class Gui
     static void Help()
     {
         ImGuiEx.TextWrapped("- Be in one of Endwalker hunt zones;");
-        ImGuiEx.TextWrapped("- Assign conductor either by right-clicking them in chat/world or enter their name manually;");
+        ImGuiEx.TextWrapped("- Assign conductors either by right-clicking them in chat/world or enter their names manually;");
     }
 }
