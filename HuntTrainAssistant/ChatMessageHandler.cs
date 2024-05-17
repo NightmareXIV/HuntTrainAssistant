@@ -8,14 +8,14 @@ namespace HuntTrainAssistant;
 
 internal unsafe static class ChatMessageHandler
 {
-    internal static (string Aetheryte, uint Territory) LastMessageLoc = (null, 0);
+    internal static (Aetheryte Aetheryte, uint Territory) LastMessageLoc = (null, 0);
     internal static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        var conductorNames = P.config.Conductors.Select(x => x.Name).ToList();
-        if (Svc.ClientState.LocalPlayer != null && P.config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote) && Svc.ClientState.TerritoryType.EqualsAny(ValidZones)) || P.config.Debug))
+        var conductorNames = P.Config.Conductors.Select(x => x.Name).ToList();
+        if (Svc.ClientState.LocalPlayer != null && P.Config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote) && Utils.IsInHuntingTerritory()) || P.Config.Debug))
         {
             var isMapLink = false;
-            var isConductorMessage = (P.config.Debug && (sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString()) || type == XivChatType.Echo)) || (TryDecodeSender(sender, out var s) && conductorNames.Contains(s.Name));
+            var isConductorMessage = (P.Config.Debug && (sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString()) || type == XivChatType.Echo)) || (TryDecodeSender(sender, out var s) && conductorNames.Contains(s.Name));
             //InternalLog.Debug($"Message: {message.ToString()} from {sender}, isConductor = {isConductorMessage}");
             foreach (var x in message.Payloads)
             {
@@ -26,17 +26,17 @@ internal unsafe static class ChatMessageHandler
                     {
                         var nearestAetheryte = MapManager.GetNearestAetheryte(m);
                         //PluginLog.Debug($"{m}");
-                        if (m.TerritoryType.RowId.EqualsAny(ValidZonesInt) || P.config.Debug)
+                        if (Utils.IsInHuntingTerritory() || P.Config.Debug)
                         {
                             if (m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
                             {
-                                if (P.config.AutoTeleport)
+                                if (P.Config.AutoTeleport)
                                 {
                                     P.TeleportTo = (nearestAetheryte, m.TerritoryType.RowId);
                                     Notify.Info("Engaging Autoteleport");
                                 }
                             }
-                            if (P.config.AutoOpenMap)
+                            if (P.Config.AutoOpenMap)
                             {
                                 if (MapFlag.Instance()->IsFlagSet && MapFlag.Instance()->TerritoryType == m.TerritoryType.RowId)
                                 {
@@ -62,7 +62,7 @@ internal unsafe static class ChatMessageHandler
                     break;
                 }
             }
-            if (P.config.SuppressChatOtherPlayers && !isMapLink && !isConductorMessage && conductorNames.Count > 0)
+            if (P.Config.SuppressChatOtherPlayers && !isMapLink && !isConductorMessage && conductorNames.Count > 0)
             {
                 isHandled = true;
             }
@@ -76,7 +76,7 @@ internal unsafe static class ChatMessageHandler
                 }
                 msg.AddUiForegroundOff();
                 message = msg.Build();
-                if (Framework.Instance()->WindowInactive || P.config.Debug)
+                if (Framework.Instance()->WindowInactive || P.Config.Debug)
                 {
                     TryNotify($"{message.ExtractText()}");
                 }

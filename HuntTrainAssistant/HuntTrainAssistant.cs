@@ -1,18 +1,21 @@
-﻿using ECommons.GameFunctions;
+﻿using ECommons.Configuration;
+using ECommons.EzIpcManager;
+using ECommons.GameFunctions;
 using ECommons.Reflection;
 using ECommons.SimpleGui;
+using ECommons.Singletons;
+using HuntTrainAssistant.PluginUI;
+using HuntTrainAssistant.Services;
+using Lumina.Excel.GeneratedSheets;
 
 namespace HuntTrainAssistant;
 
 public unsafe class HuntTrainAssistant : IDalamudPlugin
 {
     internal static HuntTrainAssistant P;
-    internal Config config;
-    internal (string Name, uint Territory) TeleportTo = (null, 0);
+    internal Config Config;
+    internal (Aetheryte Aetheryte, uint Territory) TeleportTo = (null, 0);
     internal long NextCommandAt = 0;
-    internal static ushort[] ValidZones = { 612, 613, 614, 620, 621, 622, 648, 813, 814, 815, 816, 817, 818, 956, 957, 958, 959, 960, 961, 1024 };
-    internal static uint[] ValidZonesInt = { 612, 613, 614, 620, 621, 622, 648, 813, 814, 815, 816, 817, 818, 956, 957, 958, 959, 960, 961, 1024 };
-    ContextMenuManager contextMenuManager;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
 
@@ -21,35 +24,42 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     {
         P = this;
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
-        config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
-        EzConfigGui.Init(Gui.Draw, config);
+        EzConfig.Migrate<Config>();
+        Config = EzConfig.Init<Config>();
+        EzConfigGui.Init(new MainWindow());
         EzConfigGui.Window.RespectCloseHotkey = false;
         EzCmd.Add("/hta", OnChatCommand, "toggle plugin interface\n/hta clear: clear current conductors\n/hta <player name>: add new conductor");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
-        contextMenuManager = new();
+        SingletonServiceManager.Initialize(typeof(ServiceManager));
+				EzIPC.OnSafeInvocationException += EzIPC_OnSafeInvocationException;
     }
 
-    private void ClientState_TerritoryChanged(ushort e)
+		private void EzIPC_OnSafeInvocationException(Exception obj)
+		{
+        InternalLog.Error($"During handling IPC call, exception has occurred: \n{obj}");
+		}
+
+		private void ClientState_TerritoryChanged(ushort e)
     {
         TeleportTo = (null, 0);
-        if (!e.EqualsAny(ValidZones))
+        if (!Utils.IsInHuntingTerritory())
         {
-            P.config.Conductors.Clear();
+            P.Config.Conductors.Clear();
         }
     }
 
     private void Framework_Update(object framework)
     {
-        if (Svc.ClientState.LocalPlayer != null && TeleportTo.Territory != 0 && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
+        if (Svc.ClientState.LocalPlayer != null && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
             if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
             {
                 if (Environment.TickCount64 > NextCommandAt)
                 {
                     NextCommandAt = Environment.TickCount64 + 500;
-                    Svc.Commands.ProcessCommand($"/tp {TeleportTo.Name}");
+                    S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0);
                 }
             }
             if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5)
@@ -76,7 +86,6 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 
     public void Dispose()
     {
-        contextMenuManager.Dispose();
         Svc.Chat.ChatMessage -= ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update -= Framework_Update;
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
@@ -104,14 +113,14 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         else if (arguments.StartsWith("clear"))
         {
-            P.config.Conductors.Clear();
+            P.Config.Conductors.Clear();
         }
         else
         {
             if (arguments.StartsWith("add "))
                 arguments = arguments[4..].Trim();
-            if (!P.config.Conductors.Contains(new(arguments, 0)))
-                P.config.Conductors.Add(new(arguments, 0));
+            if (!P.Config.Conductors.Contains(new(arguments, 0)))
+                P.Config.Conductors.Add(new(arguments, 0));
             EzConfigGui.Open();
         }
     }

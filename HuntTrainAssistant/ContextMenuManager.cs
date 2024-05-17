@@ -5,58 +5,57 @@ using ECommons.SimpleGui;
 
 namespace HuntTrainAssistant;
 
-internal class ContextMenuManager
+public class ContextMenuManager : IDisposable
 {
-    static readonly string[] ValidAddons = new string[]
+		private static readonly string[] ValidAddons = new string[]
 {
-        null,
-        "PartyMemberList",
-        "FriendList",
-        "FreeCompany",
-        "LinkShell",
-        "CrossWorldLinkshell",
-        "_PartyList",
-        "ChatLog",
-        "LookingForGroup",
-        "BlackList",
-        "ContentMemberList",
-        "SocialList",
-        "ContactList",
+				null,
+				"PartyMemberList",
+				"FriendList",
+				"FreeCompany",
+				"LinkShell",
+				"CrossWorldLinkshell",
+				"_PartyList",
+				"ChatLog",
+				"LookingForGroup",
+				"BlackList",
+				"ContentMemberList",
+				"SocialList",
+				"ContactList",
 };
+		private GameObjectContextMenuItem MenuItemAddConductor;
+		private DalamudContextMenu ContextMenu;
 
-    GameObjectContextMenuItem openMessenger;
-    DalamudContextMenu contextMenu;
+		private ContextMenuManager()
+		{
+				ContextMenu = new(Svc.PluginInterface);
+				MenuItemAddConductor = new GameObjectContextMenuItem(
+						new SeStringBuilder().AddUiForeground("Add as conductor", 578).Build(), AssignConductor);
+				ContextMenu.OnOpenGameObjectContextMenu += OpenContextMenu;
+		}
 
-    internal ContextMenuManager()
-    {
-        contextMenu = new(Svc.PluginInterface);
-        openMessenger = new GameObjectContextMenuItem(
-            new SeStringBuilder().AddUiForeground("Add as conductor", 578).Build(), AssignConductor);
-        contextMenu.OnOpenGameObjectContextMenu += OpenContextMenu;
-    }
+		private void OpenContextMenu(GameObjectContextMenuOpenArgs args)
+		{
+				//Svc.Chat.Print($"{args.ParentAddonName.NullSafe()}/{args.Text}/{args.ObjectWorld}");
+				if ((Utils.IsInHuntingTerritory() || P.Config.Debug)
+						&& args.Text != null
+						&& ValidAddons.Contains(args.ParentAddonName) && args.ObjectWorld != 0 && args.ObjectWorld != 65535)
+				{
+						args.AddCustomItem(MenuItemAddConductor);
+				}
+		}
 
-    private void OpenContextMenu(GameObjectContextMenuOpenArgs args)
-    {
-        //Svc.Chat.Print($"{args.ParentAddonName.NullSafe()}/{args.Text}/{args.ObjectWorld}");
-        if ((Svc.ClientState.TerritoryType.EqualsAny(ValidZones) || P.config.Debug)
-            && args.Text != null
-            && ValidAddons.Contains(args.ParentAddonName) && args.ObjectWorld != 0 && args.ObjectWorld != 65535)
-        {
-            args.AddCustomItem(openMessenger);
-        }
-    }
+		public void Dispose()
+		{
+				ContextMenu.Dispose();
+		}
 
-    public void Dispose()
-    {
-        contextMenu.Dispose();
-    }
-
-    private void AssignConductor(GameObjectContextMenuItemSelectedArgs args)
-    {
-        var player = args.Text.ToString();
-        var world = args.ObjectWorld;
-        var s = new Sender(player, world);
-        P.config.Conductors.Add(s);
-        EzConfigGui.Open();
-    }
+		private void AssignConductor(GameObjectContextMenuItemSelectedArgs args)
+		{
+				var player = args.Text.ToString();
+				var world = args.ObjectWorld;
+				var s = new Sender(player, world);
+				P.Config.Conductors.Add(s);
+				EzConfigGui.Open();
+		}
 }

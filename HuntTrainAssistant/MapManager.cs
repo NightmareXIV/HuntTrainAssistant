@@ -6,9 +6,16 @@ namespace HuntTrainAssistant;
 
 internal static class MapManager
 {
-    internal static string GetNearestAetheryte(MapLinkPayload maplinkMessage)
+    public static string GetPlaceName(this Aetheryte aetheryte)
     {
-        string aetheryteName = "";
+        if (aetheryte == null) return null;
+        return aetheryte.PlaceName.Value.Name;
+    }
+
+    internal static Aetheryte GetNearestAetheryte(MapLinkPayload maplinkMessage)
+    {
+        if(maplinkMessage == null) return null;
+				Aetheryte aetheryte = null;
         double distance = 0;
         PluginLog.Debug($"Link: {maplinkMessage.PlaceName} ({maplinkMessage.XCoord:0.00} : {maplinkMessage.YCoord:0.00})");
         foreach (var data in Svc.Data.GetExcelSheet<Aetheryte>())
@@ -32,22 +39,22 @@ internal static class MapManager
                     var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale) + compensationDelta.Y;
                     double temp_distance = Math.Pow(AethersX - maplinkMessage.XCoord, 2) + Math.Pow(AethersY - maplinkMessage.YCoord, 2);
                     PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX:0.00}, {AethersY:0.00}), distance to flag: {temp_distance:0.00}");
-                    if (aetheryteName == "" || temp_distance < distance)
+                    if (aetheryte == null || temp_distance < distance)
                     {
                         distance = temp_distance;
-                        aetheryteName = data.PlaceName.Value.Name;
+												aetheryte = data;
                     }
                 }
             }
         }
-        return aetheryteName;
+        return aetheryte;
     }
 
     internal static Vector2 getDistanceCompensationHackDelta(string AetheryteName)
     {
         float X = 0f;
         float Y = 0f;
-        if (P.config.DistanceCompensationHack)
+        if (P.Config.DistanceCompensationHack)
         {
             // Distance hacks to account for Aetheryte's Z value (or weird exits like Tertium)
             switch (AetheryteName)
