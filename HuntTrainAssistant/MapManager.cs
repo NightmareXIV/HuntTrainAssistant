@@ -76,6 +76,10 @@ internal static class MapManager
                     // one spawn point is closer to it than Palaka accounting for height
                     Y -= 2f;
                     break;
+                case "The Macarenses Angle":
+                    // never worth teleporting to, not even for the spawn point that's right above, since upward movement is very slow
+                    Y += 999f;
+                    break;
             }
         }
         return new Vector2()
