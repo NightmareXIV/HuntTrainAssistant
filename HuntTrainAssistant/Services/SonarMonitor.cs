@@ -6,6 +6,7 @@ using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
+using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using HuntTrainAssistant.DataStructures;
@@ -23,6 +24,12 @@ public class SonarMonitor : IDisposable
 		{
 				Svc.Chat.ChatMessage += Chat_ChatMessage;
 				new EzFrameworkUpdate(ContinueTeleport);
+		}
+
+		[EzIPCEvent("HuntAlerts.OnHuntTrainMessageReceived", false)]
+		private void OnHuntTrainMessageReceived(HuntTrainMessage message)
+		{
+				PluginLog.Debug($"HTM received: {message}");
 		}
 
 		private void ContinueTeleport()
@@ -115,8 +122,7 @@ public class SonarMonitor : IDisposable
 
 		private void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
 		{
-				if (!P.Config.SonarIntegration) return;
-				if (sender.ToString() == "Sonar")
+				if (P.Config.SonarIntegration && sender.ToString() == "Sonar")
 				{
 						var messageText = message.ExtractText().Replace("", "");
 						if (messageText.Contains("killed")) return;
