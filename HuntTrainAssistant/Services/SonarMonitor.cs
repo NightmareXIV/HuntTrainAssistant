@@ -115,6 +115,7 @@ public class SonarMonitor : IDisposable
 
 		private void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
 		{
+				if (!P.Config.SonarIntegration) return;
 				if (sender.ToString() == "Sonar")
 				{
 						var messageText = message.ExtractText().Replace("", "");
@@ -129,13 +130,13 @@ public class SonarMonitor : IDisposable
 						{
 								if (P.Config.AutoVisitModifyChat)
 								{
-										var payload = CreateLinkPayload(world.Name.ToString(), aetheryte, link);
+										var payload = CreateLinkPayload(world.Name, aetheryte, link);
 										message = new SeStringBuilder()
 												.Append(message)
 												.Append(" ")
 												.Add(payload.Payload)
 												.AddUiForeground((int)UIColor.Green)
-												.Append("[Go To]")
+												.Append($"[{GetGoToString(world.Name)}]")
 												.AddUiForegroundOff()
 												.Add(RawPayload.LinkTerminator)
 												.Build();
@@ -143,6 +144,12 @@ public class SonarMonitor : IDisposable
 								HandleAutoTeleport(world.Name.ToString(), aetheryte, link);
 						}
 				}
+		}
+
+		public string GetGoToString(string world)
+		{
+				if (S.LifestreamIPC.CanVisitCrossDC(world)) return $"Go To (Cross-DC)";
+				return $"Go To";
 		}
 
 		public World ParseWorldFromMessage(string message)

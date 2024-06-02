@@ -28,6 +28,7 @@ public class TabSettings
 						.Widget(() =>
 						{
 								ImGui.Checkbox("Enable Sonar integration", ref P.Config.SonarIntegration);
+								ImGuiEx.PluginAvailabilityIndicator([new("SonarPlugin", "Sonar")]);
 								ImGui.Indent();
 								ImGuiEx.TextWrapped("When a hunt mark announced in chat, automatically teleport to the target world and zone");
 								ImGui.Unindent();
