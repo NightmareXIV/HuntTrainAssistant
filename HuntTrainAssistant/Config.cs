@@ -16,10 +16,11 @@ public class Config : IEzConfig
     public bool AutoOpenMap = true;
     public bool DistanceCompensationHack = false;
     public bool SonarIntegration = false;
+    public bool HuntAlertsIntegration = false;
     public bool AutoVisitTeleportEnabled = false;
     public bool AutoVisitCrossWorld = false;
     public bool AutoVisitCrossDC = false;
     public bool AutoVisitModifyChat = true;
-    public Dictionary<Rank, List<Expansion>> AutoVisitExpansions = [];
+    public Dictionary<Rank, List<Expansion>> AutoVisitExpansionsBlacklist = [];
     public List<uint> AetheryteBlacklist = [148];
 }

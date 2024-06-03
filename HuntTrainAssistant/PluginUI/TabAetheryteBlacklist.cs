@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant.PluginUI;
 public class TabAetheryteBlacklist
 {
+		private TabAetheryteBlacklist() { }	
 		private string Filter = "";
 		private bool OnlySel = false;
 

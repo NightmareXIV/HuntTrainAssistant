@@ -6,8 +6,6 @@ namespace HuntTrainAssistant;
 
 internal static class MapManager
 {
-    //148		0		0	0	1	0	0	The Macarenses Angle		n4f6	7981484	7981485	7981486	7981487	True	9	Aetheryte	0	False	0	n4f6/00	202	10776	217
-    public static readonly uint[] BlacklistedAetherytes = [148];
 
     public static string GetPlaceName(this Aetheryte aetheryte)
     {
@@ -26,7 +24,7 @@ internal static class MapManager
             if (!data.IsAetheryte) continue;
             if (data.Territory.Value == null) continue;
             if (data.PlaceName.Value == null) continue;
-            if (data.RowId.EqualsAny(BlacklistedAetherytes)) continue;
+            if (data.RowId.EqualsAny(P.Config.AetheryteBlacklist)) continue;
             if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(m => m.TerritoryType.Row == maplinkMessage.TerritoryType.RowId, out var place))
             {
                 var scale = place.SizeFactor;

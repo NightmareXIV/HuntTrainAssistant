@@ -13,4 +13,6 @@ public static class ServiceManager
 		public static ContextMenuManager ContextMenuManager { get ; private set; }
 		public static LifestreamIPC LifestreamIPC { get; private set; }
 		public static TeleporterIPC TeleporterIPC { get; private set; }
+		public static TabAetheryteBlacklist TabAetheryteBlacklist { get; private set; }
+		public static TabIntegrations TabIntegrations { get; private set; }
 }

@@ -24,8 +24,10 @@ public unsafe class SettingsWindow : ConfigWindow
 		{
 				PatreonBanner.DrawRight();
 				ImGuiEx.EzTabBar("Bar", PatreonBanner.Text,
-						("Settings", TabSettings.Draw, null, true),
-						("Debug", TabDebug.Draw, ImGuiColors.DalamudGrey3, true),
+            ("Settings", TabSettings.Draw, null, true),
+            ("Integrations", S.TabIntegrations.Draw, null, true),
+            ("Aetheryte Blacklist", S.TabAetheryteBlacklist.Draw, null, true),
+            ("Debug", TabDebug.Draw, ImGuiColors.DalamudGrey3, true),
 						("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false)
 						);
 		}
