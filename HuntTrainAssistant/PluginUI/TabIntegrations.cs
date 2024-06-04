@@ -24,7 +24,7 @@ public class TabIntegrations
             ImGui.Unindent();
             ImGui.Separator();
             ImGui.Checkbox("Enable HuntAlerts integration", ref P.Config.HuntAlertsIntegration);
-            ImGuiEx.PluginAvailabilityIndicator([new("HuntAlerts")]);
+            ImGuiEx.PluginAvailabilityIndicator([new("HuntAlerts", new Version("1.2.1.3"))]);
             ImGuiEx.TextWrapped("When a hunt mark notification is received from server, automatically teleport to the target world and zone");
         })
 

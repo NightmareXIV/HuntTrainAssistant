@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices;
+﻿using ECommons;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,12 @@ public static class Utils
 		public static bool IsInHuntingTerritory()
 		{
 				if (ExcelTerritoryHelper.Get(Svc.ClientState.TerritoryType).TerritoryIntendedUse == (int)TerritoryIntendedUseEnum.Open_World) return true;
-				if (Svc.ClientState.TerritoryType == 1024) return true;
-				if (Svc.ClientState.TerritoryType == MainCities.Idyllshire) return true;
+        if (Svc.ClientState.TerritoryType.EqualsAny((ushort[])[
+            1024, //mare <-> garlemard gateway
+						682, 739, 759, //doman enclave
+						635, 659, //rhalgr's reach
+            ])) return true; 
+        if (Svc.ClientState.TerritoryType == MainCities.Idyllshire) return true;
 				return false;
 		}
 }
