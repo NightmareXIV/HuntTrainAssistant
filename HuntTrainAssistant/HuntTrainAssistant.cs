@@ -1,9 +1,11 @@
 ﻿using ECommons.Configuration;
 using ECommons.EzIpcManager;
 using ECommons.GameFunctions;
+using ECommons.GameHelpers;
 using ECommons.Reflection;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
+using ECommons.Throttlers;
 using HuntTrainAssistant.PluginUI;
 using HuntTrainAssistant.Services;
 using Lumina.Excel.GeneratedSheets;
@@ -15,7 +17,6 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     internal static HuntTrainAssistant P;
     internal Config Config;
     internal (Aetheryte Aetheryte, uint Territory) TeleportTo = (null, 0);
-    internal long NextCommandAt = 0;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
 
@@ -52,28 +53,38 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 
     private void Framework_Update(object framework)
     {
-        if (Svc.ClientState.LocalPlayer != null && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
+        if (Player.Interactable && IsScreenReady() && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
-            if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
+            if (Svc.ClientState.LocalPlayer.IsCasting)
             {
-                if (Environment.TickCount64 > NextCommandAt)
+                if (Svc.ClientState.LocalPlayer.CastActionId == 5)
                 {
-                    NextCommandAt = Environment.TickCount64 + 500;
-                    S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0);
-                }
-            }
-            if (Svc.ClientState.LocalPlayer.IsCasting && Svc.ClientState.LocalPlayer.CastActionId == 5)
-            {
-                if (!Svc.Condition[ConditionFlag.Casting])
-                {
-                    NextCommandAt = Environment.TickCount64 + 2000;
+                    if (!Svc.Condition[ConditionFlag.Casting])
+                    {
+                        EzThrottler.Throttle("Teleport", 2000, true);
+                    }
+                    else
+                    {
+                        EzThrottler.Throttle("Teleport", 500, true);
+                    }
                 }
                 else
                 {
-                    NextCommandAt = Environment.TickCount64 + 500;
+                    EzThrottler.Throttle("Teleport", 500, true);
                 }
             }
-            if(Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
+            if (Svc.Condition[ConditionFlag.Unknown57])
+            {
+                EzThrottler.Throttle("Teleport", 500, true);
+            }
+            if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
+            {
+                if (EzThrottler.Throttle("Teleport"))
+                {
+                    S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0);
+                }
+            }
+            if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
             {
                 TeleportTo = (null, 0);
             }

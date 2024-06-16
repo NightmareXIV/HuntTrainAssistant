@@ -12,7 +12,7 @@ internal unsafe static class ChatMessageHandler
     internal static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         var conductorNames = P.Config.Conductors.Select(x => x.Name).ToList();
-        if (Svc.ClientState.LocalPlayer != null && P.Config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote) && Utils.IsInHuntingTerritory()) || P.Config.Debug))
+        if (Svc.ClientState.LocalPlayer != null && P.Config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote, XivChatType.Echo) && Utils.IsInHuntingTerritory()) || P.Config.Debug))
         {
             var isMapLink = false;
             var isConductorMessage = (P.Config.Debug && (sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString()) || type == XivChatType.Echo)) || (TryDecodeSender(sender, out var s) && conductorNames.Contains(s.Name));

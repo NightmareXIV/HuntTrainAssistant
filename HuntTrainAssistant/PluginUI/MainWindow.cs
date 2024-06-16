@@ -54,7 +54,7 @@ public unsafe class MainWindow : ConfigWindow
 				if (P.TeleportTo.Territory == 0)
 				{
 						ImGuiEx.Text("Autoteleport: inactive");
-						if (ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte}"))
+						if (ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
 						{
 								P.TeleportTo = ChatMessageHandler.LastMessageLoc;
 						}
