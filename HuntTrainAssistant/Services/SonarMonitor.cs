@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.Text;
+﻿using Dalamud.Game;
+using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.ChatMethods;
@@ -35,7 +36,7 @@ public class SonarMonitor : IDisposable
             PluginLog.Debug($"HTM received: {message}");
 						if (P.Config.HuntAlertsIntegration)
 						{
-								var aetheryte = Svc.Data.GetExcelSheet<Aetheryte>(Dalamud.ClientLanguage.English).FirstOrDefault(x => x.GetPlaceName() == message.startLocation);
+								var aetheryte = Svc.Data.GetExcelSheet<Aetheryte>(ClientLanguage.English).FirstOrDefault(x => x.GetPlaceName() == message.startLocation);
 								if (aetheryte == null)
 								{
 										PluginLog.Warning($"Received Aetheryte = null from message {message}");
@@ -152,7 +153,7 @@ public class SonarMonitor : IDisposable
 				}
 		}
 
-		private void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+		private void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
 		{
 				if (P.Config.SonarIntegration && sender.ToString() == "Sonar")
 				{

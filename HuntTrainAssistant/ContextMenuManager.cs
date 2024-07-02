@@ -1,6 +1,7 @@
-﻿using Dalamud.ContextMenu;
+﻿using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.ChatMethods;
+using ECommons.ExcelServices;
 using ECommons.SimpleGui;
 
 namespace HuntTrainAssistant;
@@ -23,39 +24,45 @@ public class ContextMenuManager : IDisposable
 				"SocialList",
 				"ContactList",
 };
-		private GameObjectContextMenuItem MenuItemAddConductor;
-		private DalamudContextMenu ContextMenu;
+		private MenuItem MenuItemAddConductor;
 
 		private ContextMenuManager()
 		{
-				ContextMenu = new(Svc.PluginInterface);
-				MenuItemAddConductor = new GameObjectContextMenuItem(
-						new SeStringBuilder().AddUiForeground("Add as conductor", 578).Build(), AssignConductor);
-				ContextMenu.OnOpenGameObjectContextMenu += OpenContextMenu;
+
+				MenuItemAddConductor = new MenuItem()
+				{
+						Name = new SeStringBuilder().AddUiForeground("Add as conductor", 578).Build(),
+						Prefix = Dalamud.Game.Text.SeIconChar.BoxedLetterH,
+						PrefixColor = 578,
+						OnClicked = AssignConductor,
+				};
+				Svc.ContextMenu.OnMenuOpened += OpenContextMenu;
 		}
 
-		private void OpenContextMenu(GameObjectContextMenuOpenArgs args)
+		private void OpenContextMenu(IMenuOpenedArgs args)
 		{
-				//Svc.Chat.Print($"{args.ParentAddonName.NullSafe()}/{args.Text}/{args.ObjectWorld}");
 				if ((Utils.IsInHuntingTerritory() || P.Config.Debug)
-						&& args.Text != null
-						&& ValidAddons.Contains(args.ParentAddonName) && args.ObjectWorld != 0 && args.ObjectWorld != 65535)
+						&& args.Target is MenuTargetDefault mt && mt.TargetName != null
+						&& ValidAddons.Contains(args.AddonName) && mt.TargetHomeWorld.GameData != null)
 				{
-						args.AddCustomItem(MenuItemAddConductor);
+						args.AddMenuItem(MenuItemAddConductor);
 				}
 		}
 
 		public void Dispose()
-		{
-				ContextMenu.Dispose();
-		}
+    {
+        Svc.ContextMenu.OnMenuOpened -= OpenContextMenu;
+    }
 
-		private void AssignConductor(GameObjectContextMenuItemSelectedArgs args)
+		private void AssignConductor(IMenuItemClickedArgs args)
 		{
-				var player = args.Text.ToString();
-				var world = args.ObjectWorld;
-				var s = new Sender(player, world);
-				P.Config.Conductors.Add(s);
-				EzConfigGui.Open();
+				if (args.Target is MenuTargetDefault mt)
+				{
+						var player = mt.TargetName.ToString();
+						var world = mt.TargetHomeWorld;
+						var s = new Sender(player, world);
+						P.Config.Conductors.Add(s);
+						EzConfigGui.Open();
+				}
 		}
 }

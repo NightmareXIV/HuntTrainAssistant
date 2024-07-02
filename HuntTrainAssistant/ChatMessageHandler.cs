@@ -9,7 +9,7 @@ namespace HuntTrainAssistant;
 internal unsafe static class ChatMessageHandler
 {
     internal static (Aetheryte Aetheryte, uint Territory) LastMessageLoc = (null, 0);
-    internal static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal static void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         var conductorNames = P.Config.Conductors.Select(x => x.Name).ToList();
         if (Svc.ClientState.LocalPlayer != null && P.Config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote, XivChatType.Echo) && Utils.IsInHuntingTerritory()) || P.Config.Debug))

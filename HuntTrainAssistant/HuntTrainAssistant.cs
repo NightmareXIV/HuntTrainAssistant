@@ -21,7 +21,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     internal Vector3 LastPosition = Vector3.Zero;
 
 
-    public HuntTrainAssistant(DalamudPluginInterface pi)
+    public HuntTrainAssistant(IDalamudPluginInterface pi)
     {
         P = this;
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
@@ -81,7 +81,18 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
             {
                 if (EzThrottler.Throttle("Teleport"))
                 {
-                    S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0);
+                    if(S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0))
+                    {
+                        PluginLog.Information($"Teleporting using Teleporter plugin");
+                    }
+                    else if(S.LifestreamIPC.Teleport(TeleportTo.Aetheryte.RowId))
+                    {
+                        PluginLog.Information($"Teleporting using Lifestream plugin");
+                    }
+                    else
+                    {
+                        PluginLog.Warning($"Failed to teleport. ");
+                    }
                 }
             }
             if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])

@@ -18,4 +18,6 @@ public class LifestreamIPC
 		public bool CanVisitCrossDC(string world) => IPC.CanVisitCrossDC(world);
 
 		public bool IsBusy() => IPC.IsBusy();
+
+		public bool Teleport(uint aetheryte) => IPC.Teleport(aetheryte, 0);
 }

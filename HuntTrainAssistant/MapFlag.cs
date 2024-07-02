@@ -18,7 +18,7 @@ namespace HuntTrainAssistant
 
         internal static MapFlag* Instance()
         {
-            return (MapFlag*)FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalId(AgentId.Map);
+            return (MapFlag*)FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance()->GetUIModule()->GetAgentModule()->GetAgentByInternalId(AgentId.Map);
         }
     }
 }
