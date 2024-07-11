@@ -53,45 +53,48 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 
     private void Framework_Update(object framework)
     {
-        if (Player.Interactable && IsScreenReady() && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
+        if (Player.Interactable && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
-            if (Svc.ClientState.LocalPlayer.IsCasting)
+            if (IsScreenReady())
             {
-                if (Svc.ClientState.LocalPlayer.CastActionId == 5)
+                if (Svc.ClientState.LocalPlayer.IsCasting)
                 {
-                    if (!Svc.Condition[ConditionFlag.Casting])
+                    if (Svc.ClientState.LocalPlayer.CastActionId == 5)
                     {
-                        EzThrottler.Throttle("Teleport", 2000, true);
+                        if (!Svc.Condition[ConditionFlag.Casting])
+                        {
+                            EzThrottler.Throttle("Teleport", 2000, true);
+                        }
+                        else
+                        {
+                            EzThrottler.Throttle("Teleport", 500, true);
+                        }
                     }
                     else
                     {
                         EzThrottler.Throttle("Teleport", 500, true);
                     }
                 }
-                else
+                if (Svc.Condition[ConditionFlag.Unknown57])
                 {
                     EzThrottler.Throttle("Teleport", 500, true);
                 }
-            }
-            if (Svc.Condition[ConditionFlag.Unknown57])
-            {
-                EzThrottler.Throttle("Teleport", 500, true);
-            }
-            if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
-            {
-                if (EzThrottler.Throttle("Teleport"))
+                if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
                 {
-                    if(S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0))
+                    if (EzThrottler.Throttle("Teleport"))
                     {
-                        PluginLog.Information($"Teleporting using Teleporter plugin");
-                    }
-                    else if(S.LifestreamIPC.Teleport(TeleportTo.Aetheryte.RowId))
-                    {
-                        PluginLog.Information($"Teleporting using Lifestream plugin");
-                    }
-                    else
-                    {
-                        PluginLog.Warning($"Failed to teleport. ");
+                        if (S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0))
+                        {
+                            PluginLog.Information($"Teleporting using Teleporter plugin");
+                        }
+                        else if (S.LifestreamIPC.Teleport(TeleportTo.Aetheryte.RowId))
+                        {
+                            PluginLog.Information($"Teleporting using Lifestream plugin");
+                        }
+                        else
+                        {
+                            PluginLog.Warning($"Failed to teleport. ");
+                        }
                     }
                 }
             }
