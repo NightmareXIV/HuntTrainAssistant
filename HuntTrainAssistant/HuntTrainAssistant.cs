@@ -98,12 +98,12 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                     }
                 }
             }
-            if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
-            {
-                TeleportTo = (null, 0);
-            }
             IsMoving = Svc.ClientState.LocalPlayer.Position != LastPosition;
             LastPosition = Svc.ClientState.LocalPlayer.Position;
+        }
+        if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
+        {
+            TeleportTo = (null, 0);
         }
     }
 
