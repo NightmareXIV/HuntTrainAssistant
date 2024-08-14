@@ -1,4 +1,6 @@
-﻿using ECommons.Configuration;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using ECommons.Automation.NeoTaskManager;
+using ECommons.Configuration;
 using ECommons.EzIpcManager;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -6,8 +8,11 @@ using ECommons.Reflection;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.PluginUI;
 using HuntTrainAssistant.Services;
+using HuntTrainAssistant.Tasks;
 using Lumina.Excel.GeneratedSheets;
 
 namespace HuntTrainAssistant;
@@ -16,10 +21,12 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 {
     internal static HuntTrainAssistant P;
     internal Config Config;
-    internal (Aetheryte Aetheryte, uint Territory) TeleportTo = (null, 0);
+    internal (Aetheryte Aetheryte, uint Territory, int Instance) TeleportTo = default;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
-
+    public TaskManager TaskManager;
+    public int LastInstance = 0;
+    public HashSet<DawntrailARank> KilledARanks = [];
 
     public HuntTrainAssistant(IDalamudPluginInterface pi)
     {
@@ -35,6 +42,8 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
         SingletonServiceManager.Initialize(typeof(ServiceManager));
 				EzIPC.OnSafeInvocationException += EzIPC_OnSafeInvocationException;
+        TaskManager = new(new(timeLimitMS: 60*1000, showDebug:true));
+        EzIPC.OnSafeInvocationException += (x) => x.LogInternal();
     }
 
 		private void EzIPC_OnSafeInvocationException(Exception obj)
@@ -44,15 +53,33 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 
 		private void ClientState_TerritoryChanged(ushort e)
     {
-        TeleportTo = (null, 0);
+        LastInstance = 0;
+        TeleportTo = default;
         if (!Utils.IsInHuntingTerritory())
         {
             P.Config.Conductors.Clear();
         }
+        KilledARanks.Clear();
     }
 
     private void Framework_Update(object framework)
     {
+        if(LastInstance != UIState.Instance()->PublicInstance.InstanceId)
+        {
+            LastInstance = (int)UIState.Instance()->PublicInstance.InstanceId;
+            //instance changed event
+            KilledARanks.Clear();
+        }
+        if(P.Config.Conductors.Count > 0 && Utils.IsInHuntingTerritory())
+        {
+            foreach(var x in Svc.Objects)
+            {
+                if(x is IBattleNpc b && b.CurrentHp == 0 && Utils.IsNpcIdInARankList(b.NameId))
+                {
+                    KilledARanks.Add((DawntrailARank)b.NameId);
+                }
+            }
+        }
         if (Player.Interactable && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
             if (IsScreenReady())
@@ -103,7 +130,11 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
         {
-            TeleportTo = (null, 0);
+            if(TeleportTo.Instance > 0)
+            {
+                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.Row);
+            }
+            TeleportTo = default;
         }
     }
 

@@ -22,6 +22,7 @@ public class TabSettings
 								ImGui.Checkbox("Auto-open map when new location is linked", ref P.Config.AutoOpenMap);
 								ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.Config.SuppressChatOtherPlayers);
 								ImGui.Checkbox("Compensate for some aetherytes' position", ref P.Config.DistanceCompensationHack);
+								ImGui.Checkbox("Auto-teleport to next instance if two A-marks killed", ref P.Config.AutoSwitchInstanceTwoRanks);
 						})
 						.Draw();
 		}

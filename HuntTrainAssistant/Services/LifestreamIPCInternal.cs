@@ -14,7 +14,8 @@ public class LifestreamIPCInternal
 		[EzIPC] public Func<bool> IsBusy;
 		[EzIPC] public Func<uint, byte, bool> Teleport;
 
-		public LifestreamIPCInternal()
+
+    public LifestreamIPCInternal()
 		{
 				EzIPC.Init(this, "Lifestream", SafeWrapper.AnyException);
 		}

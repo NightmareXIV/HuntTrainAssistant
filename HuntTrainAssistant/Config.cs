@@ -23,4 +23,6 @@ public class Config : IEzConfig
     public bool AutoVisitModifyChat = true;
     public Dictionary<Rank, List<Expansion>> AutoVisitExpansionsBlacklist = [];
     public List<uint> AetheryteBlacklist = [148];
+    public bool EnableSonarInstanceSwitching = false;
+    public bool AutoSwitchInstanceTwoRanks = false;
 }

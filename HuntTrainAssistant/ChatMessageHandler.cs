@@ -8,7 +8,7 @@ namespace HuntTrainAssistant;
 
 internal unsafe static class ChatMessageHandler
 {
-    internal static (Aetheryte Aetheryte, uint Territory) LastMessageLoc = (null, 0);
+    internal static (Aetheryte Aetheryte, uint Territory, int Instance) LastMessageLoc = default;
     internal static void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         var conductorNames = P.Config.Conductors.Select(x => x.Name).ToList();
@@ -28,11 +28,16 @@ internal unsafe static class ChatMessageHandler
                         //PluginLog.Debug($"{m}");
                         if (Utils.IsInHuntingTerritory() || P.Config.Debug)
                         {
-                            if (m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
+                            if(P.Config.AutoTeleport)
                             {
-                                if (P.Config.AutoTeleport)
+                                if(m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
                                 {
-                                    P.TeleportTo = (nearestAetheryte, m.TerritoryType.RowId);
+                                    P.TeleportTo = (nearestAetheryte, m.TerritoryType.RowId, 0);
+                                    Notify.Info("Engaging Autoteleport");
+                                }
+                                else if(Utils.CanAutoInstanceSwitch() && P.Config.AutoSwitchInstanceTwoRanks && S.LifestreamIPC.GetCurrentInstance() < S.LifestreamIPC.GetNumberOfInstances())
+                                {
+                                    P.TeleportTo = (nearestAetheryte, m.TerritoryType.RowId, S.LifestreamIPC.GetCurrentInstance() + 1);
                                     Notify.Info("Engaging Autoteleport");
                                 }
                             }
@@ -55,7 +60,7 @@ internal unsafe static class ChatMessageHandler
                                 {
                                     Svc.GameGui.OpenMapWithMapLink(m);
                                 }
-                                LastMessageLoc = (MapManager.GetNearestAetheryte(m), m.TerritoryType.RowId);
+                                LastMessageLoc = (MapManager.GetNearestAetheryte(m), m.TerritoryType.RowId, 0);
                             }
                         }
                     }

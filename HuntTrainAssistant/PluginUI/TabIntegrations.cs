@@ -21,6 +21,7 @@ public class TabIntegrations
             ImGui.Indent();
             ImGuiEx.TextWrapped("When a hunt mark announced in chat, automatically teleport to the target world and zone");
             ImGui.Checkbox("Add click to teleport link into chat message", ref P.Config.AutoVisitModifyChat);
+            ImGui.Checkbox("Change instance after teleporting", ref P.Config.EnableSonarInstanceSwitching);
             ImGui.Unindent();
             ImGui.Separator();
             ImGui.Checkbox("Enable HuntAlerts integration", ref P.Config.HuntAlertsIntegration);

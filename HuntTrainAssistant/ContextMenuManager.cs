@@ -42,8 +42,12 @@ public class ContextMenuManager : IDisposable
 		private void OpenContextMenu(IMenuOpenedArgs args)
 		{
 				if ((Utils.IsInHuntingTerritory() || P.Config.Debug)
-						&& args.Target is MenuTargetDefault mt && mt.TargetName != null
-						&& ValidAddons.Contains(args.AddonName) && mt.TargetHomeWorld.GameData != null)
+						&& args.Target is MenuTargetDefault mt 
+						&& mt.TargetName != null
+						&& ValidAddons.Contains(args.AddonName) 
+						&& mt.TargetHomeWorld.GameData != null
+						&& ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == mt.TargetHomeWorld.Id)
+						)
 				{
 						args.AddMenuItem(MenuItemAddConductor);
 				}

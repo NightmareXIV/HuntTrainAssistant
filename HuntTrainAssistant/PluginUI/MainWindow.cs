@@ -68,7 +68,7 @@ public unsafe class MainWindow : ConfigWindow
 								P.TeleportTo.Territory = 0;
 								P.TeleportTo.Aetheryte = null;
 						}
-						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()}");
+						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()} i{P.TeleportTo.Instance}");
 				}
 				ImGui.Checkbox($"Sonar Auto-teleport", ref P.Config.AutoVisitTeleportEnabled);
 				if (P.Config.AutoVisitTeleportEnabled)

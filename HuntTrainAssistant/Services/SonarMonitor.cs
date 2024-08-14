@@ -12,20 +12,31 @@ using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using HuntTrainAssistant.DataStructures;
 using Lumina.Excel.GeneratedSheets;
-using PayloadInfo = (Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload Payload, uint ID, string World, Lumina.Excel.GeneratedSheets.Aetheryte Aetheryte, Dalamud.Game.Text.SeStringHandling.Payloads.MapLinkPayload Link);
+using PayloadInfo = (Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload Payload, uint ID, string World, Lumina.Excel.GeneratedSheets.Aetheryte Aetheryte, Dalamud.Game.Text.SeStringHandling.Payloads.MapLinkPayload Link, int Instance);
 using UIColor = ECommons.ChatMethods.UIColor;
 
 namespace HuntTrainAssistant.Services;
 public class SonarMonitor : IDisposable
 {
 		private List<PayloadInfo> Payloads = [];
-		public (Aetheryte Aetheryte, string World)? Continuation = null;
+		public (Aetheryte Aetheryte, string World, int Instance)? Continuation = null;
+		public string[] InstanceNumbers = ["", "", ""];
 
 		private SonarMonitor()
 		{
 				Svc.Chat.ChatMessage += Chat_ChatMessage;
 				new EzFrameworkUpdate(ContinueTeleport);
 				EzIPC.Init(this);
+		}
+
+		public int ParseInstanceNumber(string content)
+		{
+				PluginLog.Debug($"Parsing instance number from {content}");
+				for(int i = 0; i < InstanceNumbers.Length; i++)
+				{
+						if(content.Contains(InstanceNumbers[i])) return i + 1;
+				}
+				return 0;
 		}
 
 		[EzIPCEvent("HuntAlerts.OnHuntTrainMessageReceived", false)]
@@ -50,7 +61,7 @@ public class SonarMonitor : IDisposable
 										"srank" => Rank.S,
 										_ => throw new ArgumentOutOfRangeException(message.huntType)
 								};
-								HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload));
+								HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload), 0);
 						}
         }
 				catch(Exception ex)
@@ -66,7 +77,7 @@ public class SonarMonitor : IDisposable
 				{
 						if (Player.Interactable && IsScreenReady() && Player.CurrentWorld == Continuation.Value.World)
 						{
-								P.TeleportTo = (Continuation.Value.Aetheryte, Continuation.Value.Aetheryte.Territory.Row);
+								P.TeleportTo = (Continuation.Value.Aetheryte, Continuation.Value.Aetheryte.Territory.Row, Continuation.Value.Instance);
 								EzConfigGui.Window.IsOpen = true;
 								Continuation = null;
 						}
@@ -80,11 +91,11 @@ public class SonarMonitor : IDisposable
 				Svc.PluginInterface.RemoveChatLinkHandler();
 		}
 
-		private PayloadInfo CreateLinkPayload(string world, Aetheryte aetheryte, MapLinkPayload link)
+		private PayloadInfo CreateLinkPayload(string world, Aetheryte aetheryte, MapLinkPayload link, int instance)
 		{
 				var id = Payloads.LastOrDefault().ID + 1;
 				var payload = Svc.PluginInterface.AddChatLinkHandler(id, HandleLinkPayload);
-				var info = (payload, id, world, aetheryte, link);
+				var info = (payload, id, world, aetheryte, link, instance);
 				Payloads.Add(info);
 				PluginLog.Information($"Created payload {info}");
 				if(Payloads.Count > 100)
@@ -100,11 +111,11 @@ public class SonarMonitor : IDisposable
 		{
 				if(Payloads.TryGetFirst(x => x.ID == commandId, out var info))
 				{
-						HandleAutoTeleport(info.World, info.Aetheryte, info.Link, true, default, default);
+						HandleAutoTeleport(info.World, info.Aetheryte, info.Link, true, default, default, info.Instance);
 				}
 		}
 
-		public void HandleAutoTeleport(string world, Aetheryte aetheryte, MapLinkPayload payload, bool force, Rank rank, Expansion ex)
+		public void HandleAutoTeleport(string world, Aetheryte aetheryte, MapLinkPayload payload, bool force, Rank rank, Expansion ex, int instance)
 		{
 				if (!Player.Interactable) return;
 				if (Utils.IsInHuntingTerritory() && !force) return;
@@ -120,7 +131,7 @@ public class SonarMonitor : IDisposable
 						if (Player.CurrentWorld == world)
 						{
 								DuoLog.Information($"Same-world teleport: {world}");
-								P.TeleportTo = (aetheryte, aetheryte.Territory.Row);
+								P.TeleportTo = (aetheryte, aetheryte.Territory.Row, instance);
 								if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 								EzConfigGui.Window.IsOpen = true;
 						}
@@ -132,7 +143,7 @@ public class SonarMonitor : IDisposable
 										{
 												S.LifestreamIPC.TPAndChangeWorld(world, false, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
-												Continuation = (aetheryte, world);
+												Continuation = (aetheryte, world, instance);
 												DuoLog.Information($"Cross-world teleport: {world}");
 												EzConfigGui.Window.IsOpen = true;
 										}
@@ -140,7 +151,7 @@ public class SonarMonitor : IDisposable
 										{
 												S.LifestreamIPC.TPAndChangeWorld(world, true, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
-												Continuation = (aetheryte, world);
+												Continuation = (aetheryte, world, instance);
 												DuoLog.Information($"Cross-DC teleport: {world}");
 												EzConfigGui.Window.IsOpen = true;
 										}
@@ -169,7 +180,7 @@ public class SonarMonitor : IDisposable
 						{
 								if (P.Config.AutoVisitModifyChat)
 								{
-										var payload = CreateLinkPayload(world.Name, aetheryte, link);
+										var payload = CreateLinkPayload(world.Name, aetheryte, link, ParseInstanceNumber(messageText.ToString()));
 										message = new SeStringBuilder()
 												.Append(message)
 												.Append(" ")
@@ -180,7 +191,7 @@ public class SonarMonitor : IDisposable
 												.Add(RawPayload.LinkTerminator)
 												.Build();
 								}
-								HandleAutoTeleport(world.Name.ToString(), aetheryte, link, false, rank, ex);
+								HandleAutoTeleport(world.Name.ToString(), aetheryte, link, false, rank, ex, ParseInstanceNumber(message.ToString()));
 						}
 				}
 		}

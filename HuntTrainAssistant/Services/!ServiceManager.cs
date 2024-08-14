@@ -15,4 +15,5 @@ public static class ServiceManager
 		public static TeleporterIPC TeleporterIPC { get; private set; }
 		public static TabAetheryteBlacklist TabAetheryteBlacklist { get; private set; }
 		public static TabIntegrations TabIntegrations { get; private set; }
+		public static Chat2IPC Chat2IPC { get; private set; }
 }
