@@ -54,6 +54,10 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 		private void ClientState_TerritoryChanged(ushort e)
     {
         LastInstance = 0;
+        if(TeleportTo.Instance > 0 && e == TeleportTo.Territory)
+        {
+            TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.Row);
+        }
         TeleportTo = default;
         if (!Utils.IsInHuntingTerritory())
         {

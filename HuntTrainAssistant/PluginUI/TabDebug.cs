@@ -7,11 +7,8 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.Tasks;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NightmareUI;
+using NightmareUI.ImGuiElements;
 
 namespace HuntTrainAssistant.PluginUI;
 public unsafe class TabDebug
@@ -24,13 +21,16 @@ public unsafe class TabDebug
 				ImGui.SetNextItemWidth(100f);
 				ImGui.InputInt("Instance", ref inst);
 				ImGui.SameLine();
+				ref var world = ref Ref<int>.Get("World");
+				ImGui.SetNextItemWidth(100f);
+				WorldSelector.Instance.Draw(ref world);
 				if(ImGui.Button("Fake Sonar message"))
 				{
 						var flag = AgentMap.Instance()->FlagMapMarker;
 						var m = new XivChatEntry
 						{
 								Name = "Sonar",
-								Message = new SeStringBuilder().AddText("Rank S: ").AddMapLink(flag.TerritoryId, flag.MapId, (int)flag.XFloat * 1000, (int)flag.YFloat * 1000).AddText(ExcelTerritoryHelper.GetName(flag.TerritoryId)).Add(RawPayload.LinkTerminator).AddText($"<{Player.CurrentWorld}>").AddText(S.SonarMonitor.InstanceNumbers.SafeSelect(inst - 1) ?? "").Build()
+								Message = new SeStringBuilder().AddText("Rank S: ").AddMapLink(flag.TerritoryId, flag.MapId, (int)flag.XFloat * 1000, (int)flag.YFloat * 1000).AddText(ExcelTerritoryHelper.GetName(flag.TerritoryId)).Add(RawPayload.LinkTerminator).AddText($"<{ExcelWorldHelper.GetName(world)}>").AddText(S.SonarMonitor.InstanceNumbers.SafeSelect(inst - 1) ?? "").Build()
 						};
 
             Svc.Chat.Print(m);

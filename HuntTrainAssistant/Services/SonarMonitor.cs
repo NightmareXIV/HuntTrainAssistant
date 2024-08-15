@@ -2,9 +2,6 @@
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using ECommons.ChatMethods;
-using ECommons.Configuration;
-using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
 using ECommons.EzIpcManager;
@@ -61,7 +58,7 @@ public class SonarMonitor : IDisposable
 										"srank" => Rank.S,
 										_ => throw new ArgumentOutOfRangeException(message.huntType)
 								};
-								HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload), 0);
+								HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload), message.instance);
 						}
         }
 				catch(Exception ex)

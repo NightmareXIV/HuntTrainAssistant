@@ -14,8 +14,12 @@ public static class TaskChangeInstanceAfterTeleport
 {
     public static void Enqueue(int num, int territory)
     {
-        if(S.LifestreamIPC.GetNumberOfInstances() == 0 || num == 0) return;
-        P.TaskManager.Enqueue(() => Player.Territory == territory);
+        P.TaskManager.Enqueue(() => Player.Territory == territory && Player.Interactable);
+        P.TaskManager.Enqueue(() =>
+        {
+            if(S.LifestreamIPC.GetNumberOfInstances() == 0 || num == 0) return null;
+            return true;
+        });
         P.TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable);
         P.TaskManager.Enqueue(() =>
         {

@@ -88,7 +88,7 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				if(S.SonarMonitor.Continuation != null)
 				{
-						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Waiting to arrive at: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()}");
+						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Waiting to arrive at: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()} i{S.SonarMonitor.Continuation.Value.Instance}");
 						if (ImGui.SmallButton("Cancel##arrival"))
 						{
 								S.SonarMonitor.Continuation = null;

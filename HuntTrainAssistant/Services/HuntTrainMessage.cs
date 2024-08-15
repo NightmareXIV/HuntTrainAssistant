@@ -22,4 +22,5 @@ public record struct HuntTrainMessage
     public bool openmaponArrival;
     public bool teleporterEnabled;
     public bool lifestreamEnabled;
+    public int instance;
 }
