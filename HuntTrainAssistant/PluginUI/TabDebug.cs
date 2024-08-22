@@ -46,10 +46,6 @@ public unsafe class TabDebug
 				{
 						P.KilledARanks.Add(Enum.GetValues<DawntrailARank>().GetRandom());
 				}
-				ImGuiEx.Text($"Flag set: {MapFlag.Instance()->IsFlagSet}");
-				ImGuiEx.Text($"X: {MapFlag.Instance()->X}");
-				ImGuiEx.Text($"Y: {MapFlag.Instance()->Y}");
-				ImGuiEx.Text($"Territory: {MapFlag.Instance()->TerritoryType.GetTerritoryName()}");
 				ImGuiEx.Text($"Is moving: {P.IsMoving}");
 				if (ImGui.CollapsingHeader("Territory"))
 				{

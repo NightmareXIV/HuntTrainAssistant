@@ -3,6 +3,11 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text;
 using Lumina.Excel.GeneratedSheets;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using ECommons.MathHelpers;
+using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 
 namespace HuntTrainAssistant;
 
@@ -44,14 +49,15 @@ internal unsafe static class ChatMessageHandler
                             }
                             if (P.Config.AutoOpenMap)
                             {
-                                if (MapFlag.Instance()->IsFlagSet && MapFlag.Instance()->TerritoryType == m.TerritoryType.RowId)
+                                var flag = AgentMap.Instance()->FlagMapMarker;
+                                if (AgentMap.Instance()->IsFlagMarkerSet != 0 && flag.TerritoryId == m.TerritoryType.RowId)
                                 {
                                     if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(x => x.TerritoryType.Row == m.TerritoryType.RowId, out var place))
                                     {
                                         var pos = new Vector2(m.RawX / 1000, m.RawY / 1000);
-                                        var distance = Vector2.Distance(new(MapFlag.Instance()->X, MapFlag.Instance()->Y), pos);
+                                        var distance = Vector2.Distance(new(flag.XFloat, flag.YFloat), pos);
                                         PluginLog.Information($"Distance between map marker and linked position is {distance}");
-                                        if(distance > 10)
+                                        if(distance > 10 || !P.Config.NoDuplicateFlags)
                                         {
                                             Svc.GameGui.OpenMapWithMapLink(m);
                                         }
@@ -82,9 +88,42 @@ internal unsafe static class ChatMessageHandler
                 }
                 msg.AddUiForegroundOff();
                 message = msg.Build();
-                if (Framework.Instance()->WindowInactive || P.Config.Debug)
+
+                if(P.Config.AudioAlert)
                 {
-                    TryNotify($"{message.ExtractText()}");
+                    if(Framework.Instance()->WindowInactive || !P.Config.AudioAlertOnlyMinimized)
+                    {
+                        if(EzThrottler.Throttle("AudioPlay", P.Config.AudioThrottle))
+                        {
+                            S.Notificator.PlaySound(P.Config.AudioAlertPath, P.Config.AudioAlertVolume, false, P.Config.AudioAlertOnlyMinimized);
+                        }
+                    }
+                }
+                if(Framework.Instance()->WindowInactive || P.Config.Debug)
+                {
+                    if(P.Config.TrayNotification)
+                    {
+                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", message.ExtractText());
+                    }
+                    if(P.Config.FlashTaskbar)
+                    {
+                        S.Notificator.FlashTaskbarIcon();
+                    }
+                }
+                if(P.Config.ExecuteMacroOnFlag && isMapLink && P.Config.MacroIndex.InRange(0, RaptureMacroModule.Instance()->Shared.Length))
+                {
+                    new TickScheduler(() =>
+                    {
+                        var macro = RaptureMacroModule.Instance()->Shared[P.Config.MacroIndex];
+                        if(macro.IsNotEmpty())
+                        {
+                            RaptureShellModule.Instance()->ExecuteMacro(&macro);
+                        }
+                        else
+                        {
+                            PluginLog.Warning("Selected macro was empty");
+                        }
+                    });
                 }
             }
         }

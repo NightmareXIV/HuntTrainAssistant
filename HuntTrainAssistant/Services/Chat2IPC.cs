@@ -27,6 +27,7 @@ public class Chat2IPC : IDisposable
     [EzIPCEvent]
     void Invoke(string id, PlayerPayload? snd, ulong contentId, Payload? payload, SeString? senderString, SeString? content)
     {
+        if(!P.Config.ContextMenu) return;
         if(id == CurrentID && snd != null)
         {
             if(ImGui.Selectable("[HTA] Set as conductor"))

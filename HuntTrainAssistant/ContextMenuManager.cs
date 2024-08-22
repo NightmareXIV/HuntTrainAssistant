@@ -41,6 +41,7 @@ public class ContextMenuManager : IDisposable
 
 		private void OpenContextMenu(IMenuOpenedArgs args)
 		{
+				if(!P.Config.ContextMenu) return;
 				if ((Utils.IsInHuntingTerritory() || P.Config.Debug)
 						&& args.Target is MenuTargetDefault mt 
 						&& mt.TargetName != null

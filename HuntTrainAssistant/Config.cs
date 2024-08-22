@@ -26,4 +26,15 @@ public class Config : IEzConfig
     public bool EnableSonarInstanceSwitching = false;
     public bool AutoSwitchInstanceTwoRanks = false;
     public bool AutoSwitchInstanceToOne = false;
+    public bool NoDuplicateFlags = true;
+    public bool ContextMenu = true;
+    public bool AudioAlert = false;
+    public float AudioAlertVolume = 0.5f;
+    public bool AudioAlertOnlyMinimized = false;
+    public string AudioAlertPath = "";
+    public int AudioThrottle = 500;
+    public bool FlashTaskbar = false;
+    public bool TrayNotification = true;
+    public bool ExecuteMacroOnFlag = false;
+    public int MacroIndex = 0;
 }

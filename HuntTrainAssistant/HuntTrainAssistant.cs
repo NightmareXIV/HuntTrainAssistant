@@ -69,6 +69,10 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 
     private void Framework_Update(object framework)
     {
+        if(P.Config.Debug)
+        {
+            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("You are using debug mode in HuntTrainAssistant which will break functions of the plugin. Please disable debug mode once you don't need it.");
+        }
         if(LastInstance != UIState.Instance()->PublicInstance.InstanceId)
         {
             LastInstance = (int)UIState.Instance()->PublicInstance.InstanceId;
@@ -156,16 +160,6 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         P = null;
     }
 
-    internal static void TryNotify(string s)
-    {
-        if (DalamudReflector.TryGetDalamudPlugin("NotificationMaster", out var instance, true, true))
-        {
-            Safe(delegate
-            {
-                instance.GetType().Assembly.GetType("NotificationMaster.TrayIconManager", true).GetMethod("ShowToast").Invoke(null, new object[] { s, "HuntTrainAssistant" });
-            });
-        }
-    }
     private void OnChatCommand(string command, string arguments)
     {
         arguments = arguments.Trim();
