@@ -19,7 +19,10 @@ public class TabSettings
 								ImGui.SameLine();
 								ImGui.Checkbox("Debug mode", ref P.Config.Debug);
 								ImGui.Checkbox("Autoteleport to different zone", ref P.Config.AutoTeleport);
-								ImGui.Checkbox("Auto-open map when new location is linked", ref P.Config.AutoOpenMap);
+                ImGui.Indent();
+                ImGui.Checkbox("Auto-switch to instance 1 after teleporting", ref P.Config.AutoSwitchInstanceToOne);
+                ImGui.Unindent();
+                ImGui.Checkbox("Auto-open map when new location is linked", ref P.Config.AutoOpenMap);
 								ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.Config.SuppressChatOtherPlayers);
 								ImGui.Checkbox("Compensate for some aetherytes' position", ref P.Config.DistanceCompensationHack);
 								ImGui.Checkbox("Auto-teleport to next instance if two A-marks killed", ref P.Config.AutoSwitchInstanceTwoRanks);

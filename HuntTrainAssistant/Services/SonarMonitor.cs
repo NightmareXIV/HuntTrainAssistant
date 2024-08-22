@@ -58,7 +58,10 @@ public class SonarMonitor : IDisposable
 										"srank" => Rank.S,
 										_ => throw new ArgumentOutOfRangeException(message.huntType)
 								};
-								HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload), message.instance);
+								if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue])
+								{
+										HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload), message.instance);
+								}
 						}
         }
 				catch(Exception ex)

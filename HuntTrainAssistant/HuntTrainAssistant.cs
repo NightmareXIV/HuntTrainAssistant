@@ -64,6 +64,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
             P.Config.Conductors.Clear();
         }
         KilledARanks.Clear();
+        PluginLog.Debug($"Cleared killed A ranks list (cs_tt)");
     }
 
     private void Framework_Update(object framework)
@@ -73,13 +74,15 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
             LastInstance = (int)UIState.Instance()->PublicInstance.InstanceId;
             //instance changed event
             KilledARanks.Clear();
+            PluginLog.Debug($"Cleared killed A ranks list (inst.ch.)");
         }
         if(P.Config.Conductors.Count > 0 && Utils.IsInHuntingTerritory())
         {
             foreach(var x in Svc.Objects)
             {
-                if(x is IBattleNpc b && b.CurrentHp == 0 && Utils.IsNpcIdInARankList(b.NameId))
+                if(x is IBattleNpc b && b.CurrentHp == 0 && Utils.IsNpcIdInARankList(b.NameId) && !KilledARanks.Contains((DawntrailARank)b.NameId))
                 {
+                    PluginLog.Debug($"Added killed A rank: {(DawntrailARank)b.NameId}. Killed A ranks: {KilledARanks.Print()}");
                     KilledARanks.Add((DawntrailARank)b.NameId);
                 }
             }

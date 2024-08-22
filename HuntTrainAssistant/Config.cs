@@ -25,4 +25,5 @@ public class Config : IEzConfig
     public List<uint> AetheryteBlacklist = [148];
     public bool EnableSonarInstanceSwitching = false;
     public bool AutoSwitchInstanceTwoRanks = false;
+    public bool AutoSwitchInstanceToOne = false;
 }
