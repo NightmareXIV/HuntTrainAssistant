@@ -1,5 +1,6 @@
 ﻿using ECommons.ImGuiMethods;
 using ECommons.SimpleGui;
+using HuntTrainAssistant.Tasks;
 using System.Runtime.Intrinsics.X86;
 
 namespace HuntTrainAssistant.PluginUI;
@@ -8,13 +9,20 @@ public unsafe class MainWindow : ConfigWindow
 {
     public MainWindow() : base()
     {
-				TitleBarButtons.Add(new()
+        TitleBarButtons.Add(new()
 				{
 						Click = (m) => { if (m == ImGuiMouseButton.Left) S.SettingsWindow.IsOpen = true; },
 						Icon = FontAwesomeIcon.Cog,
 						IconOffset = new(2, 2),
 						ShowTooltip = () => ImGui.SetTooltip("Open settings window"),
 				});
+        TitleBarButtons.Add(new()
+        {
+            Click = (m) => { if(P.Config.PfinderEnable) { TaskCreateHuntPF.Enqueue(); } else { DuoLog.Warning($"Create party finder button is not enabled. Open settings to enable it."); } },
+            Icon = FontAwesomeIcon.PeopleGroup,
+            IconOffset = new(2, 2),
+            ShowTooltip = () => ImGui.SetTooltip("Create hunting party finder"),
+        });
 		}
 
     public override void Draw()

@@ -39,6 +39,12 @@ public unsafe class TabSettings
 								ImGui.Checkbox("Compensate for some aetherytes' position", ref P.Config.DistanceCompensationHack);
 								ImGui.Checkbox("Auto-teleport to next instance if two A-marks killed", ref P.Config.AutoSwitchInstanceTwoRanks);
 								ImGui.Checkbox("Context menu integration", ref P.Config.ContextMenu);
+								ImGui.Checkbox("Enable one-click party finder creation button", ref P.Config.PfinderEnable);
+								ImGui.Indent();
+								ImGuiEx.Text($"Party finder comment");
+								ImGuiEx.SetNextItemFullWidth();
+								ImGui.InputText($"##pfindercommenr", ref P.Config.PfinderString, 150);
+								ImGui.Unindent();
 						})
 						.Section("Notifications")
 						.Widget(() =>

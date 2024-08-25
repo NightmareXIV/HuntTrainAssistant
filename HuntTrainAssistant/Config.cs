@@ -37,4 +37,7 @@ public class Config : IEzConfig
     public bool TrayNotification = true;
     public bool ExecuteMacroOnFlag = false;
     public int MacroIndex = 0;
+    public List<uint> WorldBlacklist = [];
+    public string PfinderString = "";
+    public bool PfinderEnable = false;
 }

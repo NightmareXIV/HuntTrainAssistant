@@ -58,7 +58,7 @@ public class SonarMonitor : IDisposable
 										"srank" => Rank.S,
 										_ => throw new ArgumentOutOfRangeException(message.huntType)
 								};
-								if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue])
+								if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue] && !P.Config.WorldBlacklist.Contains(ExcelWorldHelper.Get(message.huntWorld)?.RowId ?? 0))
 								{
 										HandleAutoTeleport(message.huntWorld, aetheryte, payload, false, rank, ParseExpansion(payload), message.instance);
 								}
@@ -191,7 +191,10 @@ public class SonarMonitor : IDisposable
 												.Add(RawPayload.LinkTerminator)
 												.Build();
 								}
-								HandleAutoTeleport(world.Name.ToString(), aetheryte, link, false, rank, ex, ParseInstanceNumber(message.ToString()));
+								if(!P.Config.WorldBlacklist.Contains(world.RowId))
+								{
+										HandleAutoTeleport(world.Name.ToString(), aetheryte, link, false, rank, ex, ParseInstanceNumber(message.ToString()));
+								}
 						}
 				}
 		}

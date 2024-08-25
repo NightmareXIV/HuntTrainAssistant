@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.Tasks;
@@ -16,7 +17,20 @@ public unsafe class TabDebug
 		public List<byte[]> TestMessages = []; 
 
 		public void Draw()
-		{
+    {
+        ref var str = ref Ref<string>.Get("lfgtest");
+        ImGui.InputText("text", ref str, 150);
+        if(ImGui.Button("set text")) S.LFGService.SetComment(str);
+        if(TryGetAddonMaster<AddonMaster.LookingForGroupCondition>(out var ms))
+				{
+						ref var test = ref Ref<int>.Get("lfgtest");
+						if(ImGui.Button("Normal")) ms.Normal();
+						ImGui.InputInt("x", ref test);
+						if(ImGui.Button("Select group")) ms.SelectDutyCategory((byte)test);
+						//var b = ms.RemoveRoleRestriction;
+						//if(ImGui.Checkbox("RemoveRoleRestriction", ref b)) ms.RemoveRoleRestriction = b;
+				}
+
 				ref var inst = ref Ref<int>.Get("Instance");
 				ImGui.SetNextItemWidth(100f);
 				ImGui.InputInt("Instance", ref inst);

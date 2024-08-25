@@ -1,4 +1,5 @@
-﻿using HuntTrainAssistant.DataStructures;
+﻿using ECommons.ExcelServices;
+using HuntTrainAssistant.DataStructures;
 using NightmareUI.PrimaryUI;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ public class TabIntegrations
             ImGui.Checkbox("Allow cross-datacenter teleports", ref P.Config.AutoVisitCrossDC);
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream")]);
             ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
+            ImGuiEx.TreeNodeCollapsingHeader($"Blacklist Worlds ({P.Config.WorldBlacklist.Count} currently blacklisted)###blworlds", DrawWorldBlacklist);
         })
 
         .Section("Trigger Filters")
@@ -70,5 +72,26 @@ public class TabIntegrations
         })
 
         .Draw();
+    }
+
+    void DrawWorldBlacklist()
+    {
+        ImGuiEx.TextWrapped($"Auto-teleport will not be engaged to the worlds selected below. You can still use chat link to get to them manually.");
+        foreach(var r in Enum.GetValues<ExcelWorldHelper.Region>())
+        {
+            ImGuiEx.CollectionCheckbox($"Region {r}", ExcelWorldHelper.GetPublicWorlds(r).Select(x => x.RowId), P.Config.WorldBlacklist);
+            ImGui.Indent();
+            foreach(var dc in ExcelWorldHelper.GetDataCenters(r))
+            {
+                ImGuiEx.CollectionCheckbox($"{dc.Name} Data Center", ExcelWorldHelper.GetPublicWorlds(dc.RowId).Select(x => x.RowId), P.Config.WorldBlacklist);
+                ImGui.Indent();
+                foreach(var w in ExcelWorldHelper.GetPublicWorlds(dc.RowId))
+                {
+                    ImGuiEx.CollectionCheckbox($"{w.Name}", w.RowId, P.Config.WorldBlacklist);
+                }
+                ImGui.Unindent();
+            }
+            ImGui.Unindent();
+        }
     }
 }
