@@ -80,7 +80,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
             KilledARanks.Clear();
             PluginLog.Debug($"Cleared killed A ranks list (inst.ch.)");
         }
-        if(P.Config.Conductors.Count > 0 && Utils.IsInHuntingTerritory())
+        if(P.Config.Conductors.Count > 0 && Utils.IsInHuntingTerritory() && IsScreenReady())
         {
             foreach(var x in Svc.Objects)
             {
