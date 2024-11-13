@@ -1,44 +1,48 @@
 ﻿using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.Logging;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HuntTrainAssistant;
 
 internal static class MapManager
 {
 
+    public static string GetPlaceName(this Aetheryte? aetheryte)
+    {
+        if(aetheryte == null) return null;
+        return aetheryte?.PlaceName.ValueNullable?.Name.ToString();
+    }
     public static string GetPlaceName(this Aetheryte aetheryte)
     {
-        if (aetheryte == null) return null;
-        return aetheryte.PlaceName.Value.Name;
+        return aetheryte.PlaceName.ValueNullable?.Name.ToString();
     }
 
-    internal static Aetheryte GetNearestAetheryte(MapLinkPayload maplinkMessage)
+    internal static Aetheryte? GetNearestAetheryte(MapLinkPayload maplinkMessage)
     {
         if(maplinkMessage == null) return null;
-				Aetheryte aetheryte = null;
+				Aetheryte? aetheryte = null;
         double distance = 0;
         PluginLog.Debug($"Link: {maplinkMessage.PlaceName} ({maplinkMessage.XCoord:0.00} : {maplinkMessage.YCoord:0.00})");
         foreach (var data in Svc.Data.GetExcelSheet<Aetheryte>())
         {
             if (!data.IsAetheryte) continue;
-            if (data.Territory.Value == null) continue;
-            if (data.PlaceName.Value == null) continue;
+            if (data.Territory.ValueNullable == null) continue;
+            if (data.PlaceName.ValueNullable == null) continue;
             if (data.RowId.EqualsAny(P.Config.AetheryteBlacklist)) continue;
-            if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(m => m.TerritoryType.Row == maplinkMessage.TerritoryType.RowId, out var place))
+            if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(m => m.TerritoryType.RowId == maplinkMessage.TerritoryType.RowId, out var place))
             {
                 var scale = place.SizeFactor;
                 if (data.Territory.Value.RowId == maplinkMessage.TerritoryType.RowId)
                 {
-                    var mapMarker = Svc.Data.GetExcelSheet<MapMarker>().FirstOrDefault(m => (m.DataType == 3 && m.DataKey == data.RowId));
+                    var mapMarker = Svc.Data.GetSubrowExcelSheet<MapMarker>()[0].FirstOrNull(m => (m.DataType == 3 && m.DataKey.RowId == data.RowId));
                     if (mapMarker == null)
                     {
                         DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");
                         continue;
                     }
-                    Vector2 compensationDelta = getDistanceCompensationHackDelta(data.PlaceName.Value.Name);
-                    var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.X, scale) + compensationDelta.X;
-                    var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Y, scale) + compensationDelta.Y;
+                    Vector2 compensationDelta = getDistanceCompensationHackDelta(data.PlaceName.ValueNullable?.Name.ToString());
+                    var AethersX = ConvertMapMarkerToMapCoordinate(mapMarker.Value.X, scale) + compensationDelta.X;
+                    var AethersY = ConvertMapMarkerToMapCoordinate(mapMarker.Value.Y, scale) + compensationDelta.Y;
                     double temp_distance = Math.Pow(AethersX - maplinkMessage.XCoord, 2) + Math.Pow(AethersY - maplinkMessage.YCoord, 2);
                     PluginLog.Debug($"Aetheryte: {data.PlaceName.Value.Name} ({AethersX:0.00}, {AethersY:0.00}), distance to flag: {temp_distance:0.00}");
                     if (aetheryte == null || temp_distance < distance)

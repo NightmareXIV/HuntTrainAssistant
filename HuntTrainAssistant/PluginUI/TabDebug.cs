@@ -7,7 +7,7 @@ using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.Tasks;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using NightmareUI;
 using NightmareUI.ImGuiElements;
 
@@ -67,7 +67,7 @@ public unsafe class TabDebug
 						{
 								try
 								{
-										ImGuiEx.Text($"{x.RowId}: {x.PlaceName?.Value?.Name} / {x.TerritoryIntendedUse}");
+										ImGuiEx.Text($"{x.RowId}: {x.PlaceName.ValueNullable?.Name} / {x.TerritoryIntendedUse}");
 								}
 								catch (Exception e)
 								{
@@ -95,7 +95,7 @@ public unsafe class TabDebug
 						{
 								try
 								{
-										ImGuiEx.Text($"{x.RowId}: {x.PlaceName?.Value?.Name} / {x.AethernetName.Value?.Name}");
+										ImGuiEx.Text($"{x.RowId}: {x.PlaceName.ValueNullable?.Name} / {x.AethernetName.ValueNullable?.Name}");
 								}
 								catch (Exception e)
 								{

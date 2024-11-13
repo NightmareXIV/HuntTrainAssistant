@@ -13,7 +13,7 @@ using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.PluginUI;
 using HuntTrainAssistant.Services;
 using HuntTrainAssistant.Tasks;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HuntTrainAssistant;
 
@@ -21,7 +21,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 {
     internal static HuntTrainAssistant P;
     internal Config Config;
-    internal (Aetheryte Aetheryte, uint Territory, int Instance) TeleportTo = default;
+    internal ArrivalData TeleportTo = null;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
     public TaskManager TaskManager;
@@ -54,9 +54,9 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 		private void ClientState_TerritoryChanged(ushort e)
     {
         LastInstance = 0;
-        if(TeleportTo.Instance > 0 && e == TeleportTo.Territory)
+        if(TeleportTo != null && TeleportTo.Instance > 0 && e == TeleportTo.Territory)
         {
-            TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.Row);
+            TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, TeleportTo.Aetheryte.Territory.RowId);
         }
         TeleportTo = default;
         if (!Utils.IsInHuntingTerritory())
@@ -91,7 +91,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 }
             }
         }
-        if (Player.Interactable && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
+        if (Player.Interactable && TeleportTo?.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
             if (IsScreenReady())
             {
@@ -141,9 +141,9 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
         {
-            if(TeleportTo.Instance > 0)
+            if((TeleportTo?.Instance ?? 0) > 0)
             {
-                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.Row);
+                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.RowId);
             }
             TeleportTo = default;
         }

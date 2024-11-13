@@ -17,7 +17,7 @@ public static unsafe class TaskCreateHuntPF
             Notify.Error("Can't do that now");
             return;
         }
-        if(Player.Object.OnlineStatus.Id == 26)
+        if(Player.Object.OnlineStatus.RowId == 26)
         {
             Notify.Error("Already recruiting!");
             return;
@@ -77,7 +77,7 @@ public static unsafe class TaskCreateHuntPF
         }, cfg);
         P.TaskManager.Enqueue(() =>
         {
-            if(Player.Object.OnlineStatus.Id == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
+            if(Player.OnlineStatus == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 Chat.Instance.ExecuteCommand("/pfinder");
                 return true;

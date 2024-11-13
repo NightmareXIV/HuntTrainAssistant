@@ -59,10 +59,10 @@ public unsafe class MainWindow : ConfigWindow
 								newCond = "";
 						}
 				}
-				if (P.TeleportTo.Territory == 0)
+				if (P.TeleportTo == null)
 				{
 						ImGuiEx.Text("Autoteleport: inactive");
-						if (ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
+						if (ChatMessageHandler.LastMessageLoc != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
 						{
 								P.TeleportTo = ChatMessageHandler.LastMessageLoc;
 						}
@@ -73,8 +73,7 @@ public unsafe class MainWindow : ConfigWindow
 						ImGui.SameLine();
 						if (ImGui.SmallButton("Cancel"))
 						{
-								P.TeleportTo.Territory = 0;
-								P.TeleportTo.Aetheryte = null;
+								P.TeleportTo = null;
 						}
 						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()} i{P.TeleportTo.Instance}");
 				}
@@ -96,7 +95,7 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				if(S.SonarMonitor.Continuation != null)
 				{
-						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Waiting to arrive at: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()} i{S.SonarMonitor.Continuation.Value.Instance}");
+						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Waiting to arrive at: {S.SonarMonitor.Continuation.World}/{S.SonarMonitor.Continuation.Aetheryte.GetPlaceName()} i{S.SonarMonitor.Continuation.Instance}");
 						if (ImGui.SmallButton("Cancel##arrival"))
 						{
 								S.SonarMonitor.Continuation = null;

@@ -46,8 +46,8 @@ public class ContextMenuManager : IDisposable
 						&& args.Target is MenuTargetDefault mt 
 						&& mt.TargetName != null
 						&& ValidAddons.Contains(args.AddonName) 
-						&& mt.TargetHomeWorld.GameData != null
-						&& ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == mt.TargetHomeWorld.Id)
+						&& mt.TargetHomeWorld.IsValid
+						&& ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == mt.TargetHomeWorld.RowId)
 						)
 				{
 						args.AddMenuItem(MenuItemAddConductor);

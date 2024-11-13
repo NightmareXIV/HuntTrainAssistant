@@ -2,9 +2,11 @@
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Memory;
 using ECommons.Automation;
+using ECommons.Automation.UIInput;
 using ECommons.EzHookManager;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using AtkEvent = ECommons.Automation.UIInput.AtkEvent;
 
 namespace HuntTrainAssistant.Services;
 public unsafe class LFGService : IDisposable

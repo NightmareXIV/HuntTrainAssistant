@@ -1,8 +1,9 @@
 ﻿using ECommons.Automation;
 using ECommons.GameHelpers;
+using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant.Tasks;
 public static class TaskChangeInstanceAfterTeleport
 {
-    public static void Enqueue(int num, int territory)
+    public static void Enqueue(Number num, Number territory)
     {
         P.TaskManager.Enqueue(() => Player.Territory == territory && Player.Interactable);
         P.TaskManager.Enqueue(() =>
