@@ -34,7 +34,7 @@ internal static class MapManager
                 var scale = place.SizeFactor;
                 if (data.Territory.Value.RowId == maplinkMessage.TerritoryType.RowId)
                 {
-                    var mapMarker = Svc.Data.GetSubrowExcelSheet<MapMarker>()[0].FirstOrNull(m => (m.DataType == 3 && m.DataKey.RowId == data.RowId));
+                    var mapMarker = Svc.Data.GetSubrowExcelSheet<MapMarker>().AllRows().FirstOrNull(m => (m.DataType == 3 && m.DataKey.RowId == data.RowId));
                     if (mapMarker == null)
                     {
                         DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");

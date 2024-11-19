@@ -6,5 +6,6 @@
     "Description": "Provides useful tools for hunt trains such as: highlighting conductor messages and muting all other chat, auto-opening flags from conductors and auto-teleporting to announced destination. ",
     "ApplicableVersion": "any",
     "RepoUrl": "https://github.com/NightmareXIV/HuntTrainAssistant",
-    "LoadPriority": 0
+    "LoadPriority": 0,
+    "DalamudApiLevel": 11
 }
