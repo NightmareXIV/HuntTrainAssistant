@@ -61,6 +61,6 @@ public unsafe class LFGService : IDisposable
         if(s.Split("\n").Length > 2) throw new InvalidOperationException("String contains more than 2 lines");
         var bytes = Encoding.UTF8.GetBytes(s + "\0");
         if(bytes.Length > 192) throw new InvalidOperationException("String exceeds maximum length");
-        AgentLookingForGroup.Instance()->StoredRecruitmentInfo.CommentString = s;
+        AgentLookingForGroup.Instance()->StoredRecruitmentInfo.CommentString = s + "\0";
     }
 }

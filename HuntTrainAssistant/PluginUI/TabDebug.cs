@@ -1,22 +1,27 @@
 ﻿using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Plugin.Ipc.Exceptions;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.Interop;
 using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.Tasks;
 using Lumina.Excel.Sheets;
 using NightmareUI;
 using NightmareUI.ImGuiElements;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkEventDispatcher;
 
 namespace HuntTrainAssistant.PluginUI;
 public unsafe class TabDebug
 {
-		public List<byte[]> TestMessages = []; 
-
-		public void Draw()
+		public List<byte[]> TestMessages = [];
+    public void Draw()
     {
         ref var str = ref Ref<string>.Get("lfgtest");
         ImGui.InputText("text", ref str, 150);
