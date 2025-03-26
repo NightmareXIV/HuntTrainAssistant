@@ -1,10 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
+using ECommons.Events;
 using ECommons.EzIpcManager;
-using ECommons.GameFunctions;
 using ECommons.GameHelpers;
-using ECommons.Reflection;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using ECommons.Throttlers;
@@ -13,7 +12,6 @@ using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.PluginUI;
 using HuntTrainAssistant.Services;
 using HuntTrainAssistant.Tasks;
-using Lumina.Excel.Sheets;
 
 namespace HuntTrainAssistant;
 
@@ -93,6 +91,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         if (Player.Interactable && TeleportTo?.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
+            if(Utils.CheckMultiMode()) return;
             if (IsScreenReady())
             {
                 if (Svc.ClientState.LocalPlayer.IsCasting)
@@ -143,6 +142,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             if((TeleportTo?.Instance ?? 0) > 0)
             {
+                if(Utils.CheckMultiMode()) return;
                 TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.RowId);
             }
             TeleportTo = default;

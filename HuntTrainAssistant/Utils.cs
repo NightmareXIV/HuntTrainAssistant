@@ -2,6 +2,7 @@
 using ECommons;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.GameHelpers;
 using HuntTrainAssistant.DataStructures;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,22 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant;
 public static class Utils
 {
+		public static bool CheckMultiMode()
+		{
+				if(S.AutoRetainerIPC.GetMultiModeStatus())
+				{
+						S.SonarMonitor.Continuation = null;
+						P.TaskManager.Abort();
+						P.Config.AutoVisitTeleportEnabled = false;
+						P.TeleportTo = null;
+						return true;
+        }
+				else
+				{
+						return false;
+				}
+		}
+
 		public static bool IsNpcIdInARankList(uint npcId)
 		{
 				if(P.Config.Debug) return true;

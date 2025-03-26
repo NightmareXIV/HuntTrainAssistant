@@ -21,7 +21,7 @@ public class TabAetheryteBlacklist
 				ImGui.Checkbox("Only selected", ref OnlySel);
 				foreach(var x in Svc.Data.GetExcelSheet<Aetheryte>())
 				{
-						var name = x.PlaceName.Value.Name.ExtractText();
+						var name = x.PlaceName.Value.Name.GetText();
 						if (name.IsNullOrEmpty()) continue;
 						if (Filter != "" && !name.Contains(Filter, StringComparison.OrdinalIgnoreCase)) continue;
 						if (OnlySel && !P.Config.AetheryteBlacklist.Contains(x.RowId)) continue;

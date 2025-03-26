@@ -105,7 +105,7 @@ internal unsafe static class ChatMessageHandler
                 {
                     if(P.Config.TrayNotification)
                     {
-                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", message.ExtractText());
+                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", message.GetText());
                     }
                     if(P.Config.FlashTaskbar)
                     {
