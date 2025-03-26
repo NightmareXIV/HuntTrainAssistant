@@ -51,7 +51,7 @@ internal unsafe static class ChatMessageHandler
                             if (P.Config.AutoOpenMap)
                             {
                                 var flag = AgentMap.Instance()->FlagMapMarker;
-                                if (AgentMap.Instance()->IsFlagMarkerSet != 0 && flag.TerritoryId == m.TerritoryType.RowId)
+                                if (AgentMap.Instance()->IsFlagMarkerSet != false && flag.TerritoryId == m.TerritoryType.RowId)
                                 {
                                     if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(x => x.TerritoryType.RowId == m.TerritoryType.RowId, out var place))
                                     {
