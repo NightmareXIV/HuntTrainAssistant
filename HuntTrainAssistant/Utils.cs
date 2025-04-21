@@ -3,6 +3,7 @@ using ECommons;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using HuntTrainAssistant.DataStructures;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,18 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant;
 public static class Utils
 {
+		public static void DelayTeleport()
+		{
+				if(P.Config.TeleportDelayEnabled && P.Config.TeleportDelayMax > 0 && P.Config.TeleportDelayMax >= P.Config.TeleportDelayMin)
+				{
+						var num = P.Config.TeleportDelayMin + Random.Shared.Next(P.Config.TeleportDelayMax - P.Config.TeleportDelayMin);
+						if(EzThrottler.GetRemainingTime("Teleport") < num)
+						{
+								EzThrottler.Throttle("Teleport", num, true);
+						}
+				}
+		}
+
 		public static bool CheckMultiMode()
 		{
 				if(S.AutoRetainerIPC.GetMultiModeStatus())

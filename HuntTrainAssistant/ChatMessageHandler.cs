@@ -39,11 +39,13 @@ internal unsafe static class ChatMessageHandler
                                 if(m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
                                 {
                                     P.TeleportTo = ArrivalData.CreateOrNull(nearestAetheryte, m.TerritoryType.RowId, P.Config.AutoSwitchInstanceToOne?1:0);
+                                    Utils.DelayTeleport();
                                     Notify.Info("Engaging Autoteleport");
                                 }
                                 else if(Utils.CanAutoInstanceSwitch() && P.Config.AutoSwitchInstanceTwoRanks && S.LifestreamIPC.GetCurrentInstance() < S.LifestreamIPC.GetNumberOfInstances())
                                 {
                                     P.TeleportTo = ArrivalData.CreateOrNull(nearestAetheryte, m.TerritoryType.RowId, S.LifestreamIPC.GetCurrentInstance() + 1);
+                                    Utils.DelayTeleport();
                                     PluginLog.Debug($"Auto-teleporting because of two A ranks killed ({P.KilledARanks.Print()})");
                                     Notify.Info("Engaging Autoteleport");
                                 }

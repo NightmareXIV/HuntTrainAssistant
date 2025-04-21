@@ -40,4 +40,7 @@ public class Config : IEzConfig
     public List<uint> WorldBlacklist = [];
     public string PfinderString = "";
     public bool PfinderEnable = false;
+    public bool TeleportDelayEnabled = false;
+    public int TeleportDelayMin = 200;
+    public int TeleportDelayMax = 700;
 }

@@ -45,6 +45,13 @@ public unsafe class TabSettings
 								ImGuiEx.SetNextItemFullWidth();
 								ImGui.InputText($"##pfindercommenr", ref P.Config.PfinderString, 150);
 								ImGui.Unindent();
+								ImGui.Checkbox("Enable random auto-teleport delay", ref P.Config.TeleportDelayEnabled);
+								ImGui.Indent();
+								ImGui.SetNextItemWidth(150f);
+                ImGuiEx.SliderIntAsFloat("Minimum delay", ref P.Config.TeleportDelayMin, 0, 1000);
+                ImGui.SetNextItemWidth(150f);
+                ImGuiEx.SliderIntAsFloat("Maximum delay", ref P.Config.TeleportDelayMax, 0, 1000);
+                ImGui.Unindent();
 						})
 						.Section("Notifications")
 						.Widget(() =>
