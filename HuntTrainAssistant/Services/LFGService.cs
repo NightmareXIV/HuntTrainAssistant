@@ -48,7 +48,7 @@ public unsafe class LFGService : IDisposable
             Param: {evt.EventParam}
             AtkEventType: {evt.AtkEventType}
             AtkEvent.Type: {atkEvent->State.EventType}
-            Data: {MemoryHelper.ReadRaw(evt.Data, 0x40).ToHexString()}
+            Data: {(evt.Data != nint.Zero ? MemoryHelper.ReadRaw(evt.Data, 0x40).ToHexString() : "null")}
             """);
     }
 
