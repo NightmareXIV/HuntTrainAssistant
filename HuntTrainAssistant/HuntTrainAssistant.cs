@@ -118,7 +118,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 }
                 if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
                 {
-                    if (EzThrottler.Throttle("Teleport"))
+                    if (EzThrottler.Throttle("Teleport") && !Player.IsAnimationLocked)
                     {
                         if (S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0))
                         {

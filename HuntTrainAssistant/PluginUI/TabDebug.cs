@@ -14,7 +14,6 @@ using NightmareUI;
 using NightmareUI.ImGuiElements;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkEventDispatcher;
 
 namespace HuntTrainAssistant.PluginUI;
