@@ -3,9 +3,11 @@ using Dalamud.Memory.Exceptions;
 using ECommons.Automation;
 using ECommons.Interop;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using Lumina.Excel.Sheets;
 using NightmareUI.PrimaryUI;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +15,8 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant.PluginUI;
 public unsafe class TabSettings
 {
-		public void Draw()
+    Dictionary<int, string> Mounts = [new KeyValuePair<int, string>(0, "Mount roulette"), .. Svc.Data.GetExcelSheet<Mount>().Where(x => x.Singular != "").ToDictionary(x => (int)x.RowId, x => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(x.Singular.GetText()))];
+    public void Draw()
 		{
 				if(OpenFileDialog.IsSelecting())
 				{
@@ -30,6 +33,14 @@ public unsafe class TabSettings
 								ImGui.Checkbox("Autoteleport to different zone", ref P.Config.AutoTeleport);
                 ImGui.Indent();
                 ImGui.Checkbox("Auto-switch to instance 1 after teleporting", ref P.Config.AutoSwitchInstanceToOne);
+								ImGui.Checkbox("Mount up after arriving to your teleport destination", ref P.Config.UseMount);
+								if(P.Config.UseMount)
+								{
+										ImGui.Indent();
+                    ImGui.SetNextItemWidth(200f);
+                    ImGuiEx.Combo("Preferred Mount", ref P.Config.Mount, Mounts.Keys, names: Mounts);
+                    ImGui.Unindent();
+								}
                 ImGui.Unindent();
                 ImGui.Checkbox("Auto-open map when new location is linked", ref P.Config.AutoOpenMap);
 								ImGui.Indent();

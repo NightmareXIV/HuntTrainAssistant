@@ -52,11 +52,17 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 		private void ClientState_TerritoryChanged(ushort e)
     {
         LastInstance = 0;
-        if(TeleportTo != null && TeleportTo.Instance > 0 && e == TeleportTo.Territory)
+        if(TeleportTo != null)
         {
-            TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, TeleportTo.Aetheryte.Territory.RowId);
+            TaskManager.Abort();
+            if(TeleportTo.Instance > 0 && e == TeleportTo.Territory)
+            {
+                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, TeleportTo.Aetheryte.Territory.RowId);
+            }
+            TaskMount.EnqueueIfEnabled();
+            PluginLog.Debug($"TeleportTo reset (2)");
+            TeleportTo = null;
         }
-        TeleportTo = default;
         if (!Utils.IsInHuntingTerritory())
         {
             P.Config.Conductors.Clear();
@@ -112,7 +118,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                         EzThrottler.Throttle("Teleport", 500, true);
                     }
                 }
-                if (Svc.Condition[ConditionFlag.Unknown57])
+                if (Svc.Condition[ConditionFlag.MountOrOrnamentTransition])
                 {
                     EzThrottler.Throttle("Teleport", 500, true);
                 }
@@ -140,12 +146,18 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
         {
-            if((TeleportTo?.Instance ?? 0) > 0)
+            if(TeleportTo != null)
             {
-                if(Utils.CheckMultiMode()) return;
-                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.RowId);
+                TaskManager.Abort();
+                if(TeleportTo.Instance > 0)
+                {
+                    if(Utils.CheckMultiMode()) return;
+                    TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.RowId);
+                }
+                TaskMount.EnqueueIfEnabled();
+                PluginLog.Debug($"TeleportTo reset (1)");
+                TeleportTo = null;
             }
-            TeleportTo = default;
         }
     }
 

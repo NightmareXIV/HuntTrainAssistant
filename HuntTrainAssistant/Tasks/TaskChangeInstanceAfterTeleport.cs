@@ -18,52 +18,57 @@ public static class TaskChangeInstanceAfterTeleport
         P.TaskManager.Enqueue(() => Player.Territory == territory && Player.Interactable);
         P.TaskManager.Enqueue(() =>
         {
-            if(S.LifestreamIPC.GetNumberOfInstances() == 0 || num == 0 || S.LifestreamIPC.GetCurrentInstance() == num) return null;
-            return true;
-        });
-        P.TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable);
-        P.TaskManager.Enqueue(() =>
-        {
-            if(!S.LifestreamIPC.CanChangeInstance())
+            if(!(S.LifestreamIPC.GetNumberOfInstances() == 0 || num == 0 || S.LifestreamIPC.GetCurrentInstance() == num))
             {
-                var nearestAetheryte = Svc.Objects.Where(x => x.ObjectKind == Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Aetheryte && x.IsTargetable).OrderBy(x => Vector3.Distance(Player.Position, x.Position)).FirstOrDefault();
-                if(nearestAetheryte != null)
+                P.TaskManager.InsertStack(() =>
                 {
-                    if(nearestAetheryte.IsTarget() && EzThrottler.Throttle("Lockon"))
+                    P.TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable);
+                    P.TaskManager.Enqueue(() =>
                     {
-                        Chat.Instance.ExecuteCommand("/lockon");
-                        P.TaskManager.Insert(() => Chat.Instance.ExecuteCommand("/automove on"));
-                        return true;
-                    }
-                    else
-                    {
-                        if(EzThrottler.Throttle("SetTarget"))
+                        if(!S.LifestreamIPC.CanChangeInstance())
                         {
-                            Svc.Targets.Target = nearestAetheryte;
+                            var nearestAetheryte = Svc.Objects.Where(x => x.ObjectKind == Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Aetheryte && x.IsTargetable).OrderBy(x => Vector3.Distance(Player.Position, x.Position)).FirstOrDefault();
+                            if(nearestAetheryte != null)
+                            {
+                                if(nearestAetheryte.IsTarget() && EzThrottler.Throttle("Lockon"))
+                                {
+                                    Chat.ExecuteCommand("/lockon");
+                                    P.TaskManager.Insert(() => Chat.ExecuteCommand("/automove on"));
+                                    return true;
+                                }
+                                else
+                                {
+                                    if(EzThrottler.Throttle("SetTarget"))
+                                    {
+                                        Svc.Targets.Target = nearestAetheryte;
+                                    }
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    });
+                    P.TaskManager.Enqueue(() =>
+                    {
+                        if(S.LifestreamIPC.GetCurrentInstance() == num) return true;
+                        if(S.LifestreamIPC.CanChangeInstance())
+                        {
+                            Chat.ExecuteCommand("/automove off");
+                            S.LifestreamIPC.ChangeInstance(num);
+                            return true;
                         }
                         return false;
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return true;
+                    }, new(timeLimitMS: 15000));
+                });
             }
         });
-        P.TaskManager.Enqueue(() =>
-        {
-            if(S.LifestreamIPC.GetCurrentInstance() == num) return true;
-            if(S.LifestreamIPC.CanChangeInstance())
-            {
-                Chat.Instance.ExecuteCommand("/automove off");
-                S.LifestreamIPC.ChangeInstance(num);
-                return true;
-            }
-            return false;
-        }, new(timeLimitMS:15000));
+        
     }
 }

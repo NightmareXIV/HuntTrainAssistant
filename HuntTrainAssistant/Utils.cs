@@ -5,6 +5,7 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using HuntTrainAssistant.DataStructures;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,12 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant;
 public static class Utils
 {
-		public static void DelayTeleport()
+    public static string GetMountName(int id)
+    {
+        return Svc.Data.GetExcelSheet<Mount>().GetRow((uint)id).Singular.ExtractText();
+    }
+
+    public static void DelayTeleport()
 		{
 				if(P.Config.TeleportDelayEnabled && P.Config.TeleportDelayMax > 0 && P.Config.TeleportDelayMax >= P.Config.TeleportDelayMin)
 				{
@@ -33,7 +39,8 @@ public static class Utils
 						S.SonarMonitor.Continuation = null;
 						P.TaskManager.Abort();
 						P.Config.AutoVisitTeleportEnabled = false;
-						P.TeleportTo = null;
+            PluginLog.Debug($"TeleportTo reset (4)");
+            P.TeleportTo = null;
 						return true;
         }
 				else

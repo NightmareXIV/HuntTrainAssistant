@@ -43,4 +43,6 @@ public class Config : IEzConfig
     public bool TeleportDelayEnabled = false;
     public int TeleportDelayMin = 200;
     public int TeleportDelayMax = 700;
+    public bool UseMount = true;
+    public int Mount = 0;
 }

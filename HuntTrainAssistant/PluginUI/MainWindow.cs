@@ -1,4 +1,5 @@
-﻿using ECommons.ImGuiMethods;
+﻿using Dalamud.Interface.Style;
+using ECommons.ImGuiMethods;
 using ECommons.SimpleGui;
 using HuntTrainAssistant.Tasks;
 using System.Runtime.Intrinsics.X86;
@@ -61,7 +62,7 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				if (P.TeleportTo == null)
 				{
-						ImGuiEx.Text("Autoteleport: inactive");
+						ImGuiEx.Text(ImGuiColors.DalamudGrey3, "Autoteleport: inactive");
 						if (ChatMessageHandler.LastMessageLoc != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
 						{
 								P.TeleportTo = ChatMessageHandler.LastMessageLoc;
@@ -72,12 +73,26 @@ public unsafe class MainWindow : ConfigWindow
 						ImGuiEx.Text($"Autoteleport active.");
 						ImGui.SameLine();
 						if (ImGui.SmallButton("Cancel"))
-						{
-								P.TeleportTo = null;
+            {
+                PluginLog.Debug($"TeleportTo reset (3)");
+                P.TeleportTo = null;
 						}
 						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()} i{P.TeleportTo.Instance}");
 				}
-				ImGui.Checkbox($"Sonar Auto-teleport", ref P.Config.AutoVisitTeleportEnabled);
+				if(P.TaskManager.IsBusy)
+				{
+						ImGuiEx.Text($"{P.TaskManager.NumQueuedTasks:D2} tasks processing");
+            ImGui.SameLine();
+            if(ImGui.SmallButton("Stop##tm"))
+            {
+								P.TaskManager.Abort();
+            }
+        }
+				else
+				{
+						ImGuiEx.Text(ImGuiColors.DalamudGrey3, $"Task manager: inactive");
+				}
+						ImGui.Checkbox($"Sonar Auto-teleport", ref P.Config.AutoVisitTeleportEnabled);
 				if (P.Config.AutoVisitTeleportEnabled)
 				{
 						if (!Utils.IsInHuntingTerritory())
