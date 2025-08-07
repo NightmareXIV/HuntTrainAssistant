@@ -2,6 +2,7 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Ipc.Exceptions;
+using ECommons.CSExtensions;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.UIHelpers.AddonMasterImplementations;

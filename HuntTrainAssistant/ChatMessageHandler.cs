@@ -8,6 +8,7 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.UI.Shell;
+using ECommons.CSExtensions;
 
 namespace HuntTrainAssistant;
 

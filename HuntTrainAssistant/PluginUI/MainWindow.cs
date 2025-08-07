@@ -47,7 +47,7 @@ public unsafe class MainWindow : ConfigWindow
 						}
 				}
 				ImGuiEx.SetNextItemFullWidth();
-				ImGui.ListBox("##conds", ref condIndex, condNames, condNames.Length, Math.Clamp(condNames.Length, 1, 3));
+				ImGui.ListBox("##conds", ref condIndex, condNames, Math.Clamp(condNames.Length, 1, 3));
 				ImGuiEx.Text("Add conductor:");
 				ImGui.SameLine();
 				ImGui.SetNextItemWidth(150f);

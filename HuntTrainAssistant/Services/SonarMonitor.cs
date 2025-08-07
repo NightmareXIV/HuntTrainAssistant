@@ -9,13 +9,13 @@ using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using HuntTrainAssistant.DataStructures;
 using Lumina.Excel.Sheets;
-using PayloadInfo = (Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload Payload, uint ID, string World, Lumina.Excel.Sheets.Aetheryte Aetheryte, Dalamud.Game.Text.SeStringHandling.Payloads.MapLinkPayload Link, int Instance);
+using PayloadInfo = (Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload Payload, string World, Lumina.Excel.Sheets.Aetheryte Aetheryte, Dalamud.Game.Text.SeStringHandling.Payloads.MapLinkPayload Link, int Instance);
 using UIColor = ECommons.ChatMethods.UIColor;
 
 namespace HuntTrainAssistant.Services;
 public class SonarMonitor : IDisposable
 {
-		private List<PayloadInfo> Payloads = [];
+		private OrderedDictionary<Guid, PayloadInfo> Payloads = [];
 		public ArrivalData Continuation = null;
 		public string[] InstanceNumbers = ["", "", ""];
 
@@ -92,28 +92,27 @@ public class SonarMonitor : IDisposable
 		public void Dispose()
 		{
 				Svc.Chat.ChatMessage -= Chat_ChatMessage;
-				Svc.PluginInterface.RemoveChatLinkHandler();
+				Svc.Chat.RemoveChatLinkHandler();
 		}
 
 		private PayloadInfo CreateLinkPayload(string world, Aetheryte aetheryte, MapLinkPayload link, int instance)
 		{
-				var id = Payloads.LastOrDefault().ID + 1;
-				var payload = Svc.PluginInterface.AddChatLinkHandler(id, HandleLinkPayload);
-				var info = (payload, id, world, aetheryte, link, instance);
-				Payloads.Add(info);
+				var payload = Svc.Chat.AddChatLinkHandler(HandleLinkPayload);
+				var info = (payload, world, aetheryte, link, instance);
+				Payloads[payload.CommandId] = info;
 				PluginLog.Information($"Created payload {info}");
 				if(Payloads.Count > 100)
 				{
-						Svc.PluginInterface.RemoveChatLinkHandler(Payloads[0].ID);
-						PluginLog.Information($"Deleted first payload {Payloads[0]}");
+						Svc.Chat.RemoveChatLinkHandler(Payloads.GetAt(0).Key);
+						PluginLog.Information($"Deleted first payload {Payloads.GetAt(0).Value}");
 						Payloads.RemoveAt(0);
 				}
 				return info;
 		}
 
-		private void HandleLinkPayload(uint commandId, SeString message)
+		private void HandleLinkPayload(Guid commandId, SeString message)
 		{
-				if(Payloads.TryGetFirst(x => x.ID == commandId, out var info))
+				if(Payloads.TryGetValue(commandId, out var info))
 				{
 						HandleAutoTeleport(info.World, info.Aetheryte, info.Link, true, default, default, info.Instance);
 				}
