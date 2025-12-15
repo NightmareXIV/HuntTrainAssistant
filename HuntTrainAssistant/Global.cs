@@ -19,3 +19,4 @@ global using ECommons.Schedulers;
 global using static HuntTrainAssistant.HuntTrainAssistant;
 global using Dalamud.Game.ClientState.Conditions;
 global using S = HuntTrainAssistant.Services.ServiceManager;
+global using Player = ECommons.GameHelpers.LegacyPlayer.Player;
