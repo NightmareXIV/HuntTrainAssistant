@@ -2,12 +2,13 @@
 A plugin that makes hunting in FFXIV less cumbersome.
 ## Become a Supporter!
 If you like HuntTrainAssistant, please consider becoming a supporter on Patreon or via other means! This will help me to continue updating HuntTrainAssistant and work on new plugins and features and you will receive benefits such as early progress updates, priority support, prioritized feature requests, early testing builds and private tools. 
-- [Subscribe on Patreon](https://subscribe.nightmarexiv.com/) - eligible for Discord role
-- [Donate Litecoin, Bitcoin, Tether or other crypto](https://crypto.nightmarexiv.com/) - eligible for Discord role
+- [Subscribe on Patreon (Starts from $1)](https://subscribe.nightmarexiv.org/) - eligible for Discord role
+- [Donate Litecoin, Bitcoin, Tether or other crypto](https://crypto.nightmarexiv.org/) - eligible for Discord role
+- [One-time donation on Ko-Fi](https://ko-fi.com/nightmarexiv)
 
 ### Also:
-- [Explore other plugins I maintain or contributed to](https://explore.nightmarexiv.com/)
-- [Join NightmareXIV Discord server to receive fast support and pings about plugin updates](https://discord.gg/m8NRt4X8Gf)
+- [Explore other plugins I maintain or contributed to](https://explore.nightmarexiv.org/)
+- [Join NightmareXIV Discord server to receive fast support and pings about plugin updates](https://discord.gg/BeeRFKDJD3)
 ## Core features
 - Assign a conductor and have their messages highlighted and everyone else - temporarily muted;
 - Auto-open a map when conductor posts new link;
@@ -27,3 +28,11 @@ You should now have NightmareXIV plugins available in your plugin installer. <br
 Open plugin installer by typing `/xlplugins` in game chat, go to "Available plugins" section and search for a plugin you would like to install.
 
 ![image](https://github.com/NightmareXIV/MyDalamudPlugins/blob/main/meta/install/installer.png?raw=true)
+
+## Support
+Join NightmareXIV Discord server to receive support for this plugin: https://discord.gg/m8NRt4X8Gf
+[![](https://dcbadge.vercel.app/api/server/m8NRt4X8Gf)](https://discord.gg/m8NRt4X8Gf)
+
+The server operates on a ticket-based system. Please create a ticket and describe your issue.
+Additionally, you may create an issue in the repository. Reply time for tickets may be significantly longer than on Discord, however, the issue does not have any risks to be lost.
+(Basically, if you want to report a critical bug or receive help, prefer Discord, if you want to suggest feature or report non-critical bug, prefer Github)
