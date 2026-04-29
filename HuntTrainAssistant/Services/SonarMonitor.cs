@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
@@ -176,17 +177,17 @@ public class SonarMonitor : IDisposable
         }
     }
 
-    private void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
+    private void Chat_ChatMessage(IHandleableChatMessage cm)
     {
         if(Utils.CheckMultiMode()) return;
-        if(P.Config.SonarIntegration && sender.ToString() == "Sonar")
+        if(P.Config.SonarIntegration && cm.Sender.ToString() == "Sonar")
         {
-            var messageText = message.GetText().Replace("", "");
+            var messageText = cm.Message.GetText().Replace("", "");
             if(messageText.Contains("killed")) return;
             var world = ParseWorldFromMessage(messageText);
             var rank = ParseRankFromMessage(messageText);
-            var ex = ParseExpansionFromMessage(message);
-            var link = message.Payloads.OfType<MapLinkPayload>().FirstOrDefault();
+            var ex = ParseExpansionFromMessage(cm.Message);
+            var link = cm.Message.Payloads.OfType<MapLinkPayload>().FirstOrDefault();
             var aetheryte = MapManager.GetNearestAetheryte(link);
             PluginLog.Information($"World={world}, rank={rank}, ex={ex}, aetheryte={aetheryte.GetPlaceName()}");
             if(world != null && rank != Rank.Unknown && ex != Expansion.Unknown && aetheryte != null)
@@ -194,8 +195,8 @@ public class SonarMonitor : IDisposable
                 if(P.Config.AutoVisitModifyChat)
                 {
                     var payload = CreateLinkPayload(world.Value.Name.ToString(), aetheryte.Value, link, ParseInstanceNumber(messageText.ToString()));
-                    message = new SeStringBuilder()
-                        .Append(message)
+                    cm.Message = new SeStringBuilder()
+                        .Append(cm.Message)
                         .Append(" ")
                         .Add(payload.Payload)
                         .AddUiForeground((int)UIColor.Green)
@@ -206,7 +207,7 @@ public class SonarMonitor : IDisposable
                 }
                 if(world.Value.RowId == Player.CurrentWorldId || !P.Config.WorldBlacklist.Contains(world.Value.RowId))
                 {
-                    HandleAutoTeleport(world.Value.Name.ToString(), aetheryte.Value, link, false, rank, ex, ParseInstanceNumber(message.ToString()));
+                    HandleAutoTeleport(world.Value.Name.ToString(), aetheryte.Value, link, false, rank, ex, ParseInstanceNumber(cm.Message.ToString()));
                 }
             }
         }

@@ -9,21 +9,23 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 using ECommons.CSExtensions;
+using ECommons.DalamudServices.Legacy;
+using Dalamud.Game.Chat;
 
 namespace HuntTrainAssistant;
 
 internal unsafe static class ChatMessageHandler
 {
     internal static ArrivalData LastMessageLoc = null;
-    internal static void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal static void Chat_ChatMessage(IHandleableChatMessage cm)
     {
         var conductorNames = P.Config.Conductors.Select(x => x.Name).ToList();
-        if (Svc.ClientState.LocalPlayer != null && P.Config.Enabled && ((type.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote, XivChatType.Echo) && Utils.IsInHuntingTerritory()) || P.Config.Debug))
+        if (Svc.ClientState.LocalPlayer != null && P.Config.Enabled && ((cm.LogKind.EqualsAny(XivChatType.Shout, XivChatType.Yell, XivChatType.Say, XivChatType.CustomEmote, XivChatType.StandardEmote, XivChatType.Echo) && Utils.IsInHuntingTerritory()) || P.Config.Debug))
         {
             var isMapLink = false;
-            var isConductorMessage = (P.Config.Debug && (sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString()) || type == XivChatType.Echo)) || (TryDecodeSender(sender, out var s) && conductorNames.Contains(s.Name));
+            var isConductorMessage = (P.Config.Debug && (cm.Sender.ToString().Contains(Svc.ClientState.LocalPlayer.Name.ToString()) || cm.LogKind == XivChatType.Echo)) || (TryDecodeSender(cm.Sender, out var s) && conductorNames.Contains(s.Name));
             //InternalLog.Debug($"Message: {message.ToString()} from {sender}, isConductor = {isConductorMessage}");
-            foreach (var x in message.Payloads)
+            foreach (var x in cm.Message.Payloads)
             {
                 if (x is MapLinkPayload m)
                 {
@@ -81,18 +83,18 @@ internal unsafe static class ChatMessageHandler
             }
             if (P.Config.SuppressChatOtherPlayers && !isMapLink && !isConductorMessage && conductorNames.Count > 0)
             {
-                isHandled = true;
+                cm.PreventOriginal();
             }
             if (isConductorMessage)
             {
                 var msg = new SeStringBuilder();
                 msg.AddUiForeground(578);
-                foreach (var x in message.Payloads)
+                foreach (var x in cm.Message.Payloads)
                 {
                     msg.Add(x);
                 }
                 msg.AddUiForegroundOff();
-                message = msg.Build();
+                cm.Message = msg.Build();
 
                 if(P.Config.AudioAlert)
                 {
@@ -108,7 +110,7 @@ internal unsafe static class ChatMessageHandler
                 {
                     if(P.Config.TrayNotification)
                     {
-                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", message.GetText());
+                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", cm.Message.GetText());
                     }
                     if(P.Config.FlashTaskbar)
                     {

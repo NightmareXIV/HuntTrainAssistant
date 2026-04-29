@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
+using ECommons.DalamudServices.Legacy;
 using ECommons.Events;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
@@ -49,7 +50,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         InternalLog.Error($"During handling IPC call, exception has occurred: \n{obj}");
 		}
 
-		private void ClientState_TerritoryChanged(ushort e)
+		private void ClientState_TerritoryChanged(uint e)
     {
         LastInstance = 0;
         if(TeleportTo != null)

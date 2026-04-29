@@ -58,11 +58,11 @@ public static class Utils
 		public static bool IsInHuntingTerritory()
 		{
 				if (ExcelTerritoryHelper.Get(Svc.ClientState.TerritoryType)?.TerritoryIntendedUse.RowId == (int)TerritoryIntendedUseEnum.Open_World) return true;
-        if (Svc.ClientState.TerritoryType.EqualsAny((ushort[])[
+        if (Svc.ClientState.TerritoryType.EqualsAny<uint>(
             1024, //mare <-> garlemard gateway
 						682, 739, 759, //doman enclave
-						635, 659, //rhalgr's reach
-            ])) return true; 
+						635, 659 //rhalgr's reach
+            )) return true; 
         if (Svc.ClientState.TerritoryType == MainCities.Idyllshire) return true;
 				return false;
 		}
