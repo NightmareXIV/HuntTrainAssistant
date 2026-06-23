@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant.PluginUI;
 public unsafe class TabSettings
 {
-    Dictionary<int, string> Mounts = [new KeyValuePair<int, string>(0, "Mount roulette"), .. Svc.Data.GetExcelSheet<Mount>().Where(x => x.Singular != "").ToDictionary(x => (int)x.RowId, x => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(x.Singular.GetText()))];
+    OrderedDictionary<int, string> Mounts = [new KeyValuePair<int, string>(0, "Mount roulette"), .. Svc.Data.GetExcelSheet<Mount>().Where(x => x.Singular != "").OrderBy(x => x.Singular.GetText().ToUpper()).ToDictionary(x => (int)x.RowId, x => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(x.Singular.GetText()))];
     public void Draw()
 		{
 				if(OpenFileDialog.IsSelecting())
