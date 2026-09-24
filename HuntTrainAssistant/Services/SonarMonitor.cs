@@ -54,7 +54,7 @@ public class SonarMonitor : IDisposable
                     return;
                 }
                 var coords = message.locationCoords.Split(", ");
-                var payload = new MapLinkPayload(aetheryte.Value.Territory.RowId, aetheryte.Value.Map.RowId, float.Parse(coords[0]), float.Parse(coords[1]));
+                var payload = new MapLinkPayload(aetheryte.Value.Territory.RowId, aetheryte.Value.Map.RowId, float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture), float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture));
                 var rank = message.huntType switch
                 {
                     "new_hunt" => Rank.A,
